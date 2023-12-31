@@ -26,6 +26,29 @@ This section will overview the taxonomy of microarchitectural primitive componen
     \label{fig:mdparser}
 \end{figure}
 
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\toprule
+ format   & strategy       & coordinate\_arithmetic   \\
+\midrule
+ U        & no\_arithmetic  & sentinel                \\
+ U        & yes\_arithmetic & sentinel                \\
+ U        & no\_arithmetic  & length\_field            \\
+ U        & yes\_arithmetic & length\_field            \\
+ C        & no\_arithmetic  & sentinel                \\
+ C        & yes\_arithmetic & sentinel                \\
+ C        & no\_arithmetic  & length\_field            \\
+ C        & yes\_arithmetic & length\_field            \\
+ B        & no\_arithmetic  & sentinel                \\
+ B        & yes\_arithmetic & sentinel                \\
+ B        & no\_arithmetic  & length\_field            \\
+ B        & yes\_arithmetic & length\_field            \\
+\bottomrule
+\end{tabular}
+\caption{Specializations of MetadataParser}
+\label{tab:MetadataParser_specializations}
+\end{table}
 
 \subsection{Position generators}
 
@@ -38,6 +61,20 @@ This section will overview the taxonomy of microarchitectural primitive componen
     \label{fig:pgen1}
 \end{figure}
 
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\toprule
+ format\_src   & format\_dst   & strategy    \\
+\midrule
+ C            & U            & passthrough \\
+ C            & U            & counter     \\
+\bottomrule
+\end{tabular}
+\caption{Specializations of SinglePositionGenerator}
+\label{tab:SinglePositionGenerator_specializations}
+\end{table}
+
 \subsubsection{Dual position generators}
 
 \begin{figure}[H]
@@ -46,6 +83,20 @@ This section will overview the taxonomy of microarchitectural primitive componen
     \caption{Dual position generator.}
     \label{fig:pgen2}
 \end{figure}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{llll}
+\toprule
+ format\_src   & format\_dst   & source\_strategy        & reference\_strategy             \\
+\midrule
+ B            & B            & ripple\_prefix\_sum      & parallel\_dec2\_priority\_encoder \\
+ B            & B            & kogge\_stone\_prefix\_sum & parallel\_dec2\_priority\_encoder \\
+\bottomrule
+\end{tabular}
+\caption{Specializations of DoublePositionGenerator}
+\label{tab:DoublePositionGenerator_specializations}
+\end{table}
 
 \subsection{Intersection units}
 
@@ -58,6 +109,21 @@ This section will overview the taxonomy of microarchitectural primitive componen
     \label{fig:fopt}
 \end{figure}
 
+\begin{table}[H]
+\centering
+\begin{tabular}{ll}
+\toprule
+ format\_leader   & strategy    \\
+\midrule
+ C               & passthrough \\
+ B               & passthrough \\
+ R               & passthrough \\
+\bottomrule
+\end{tabular}
+\caption{Specializations of IntersectionLeaderFollower}
+\label{tab:IntersectionLeaderFollower_specializations}
+\end{table}
+
 \subsubsection{Bidirectional intersection units}
 
 \begin{figure}[H]
@@ -67,6 +133,22 @@ This section will overview the taxonomy of microarchitectural primitive componen
     \label{fig:fopt}
 \end{figure}
 
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\toprule
+ format\_0   & format\_1   & strategy         \\
+\midrule
+ C          & C          & two\_finger\_merge \\
+ C          & C          & skip\_ahead       \\
+ C          & C          & direct\_map       \\
+ B          & B          & bitwise\_and      \\
+\bottomrule
+\end{tabular}
+\caption{Specializations of IntersectionBidirectional}
+\label{tab:IntersectionBidirectional_specializations}
+\end{table}
+
 \subsection{Fill optimizers}
 
 \begin{figure}[H]
@@ -75,6 +157,20 @@ This section will overview the taxonomy of microarchitectural primitive componen
     \caption{Fill optimizer.}
     \label{fig:fopt}
 \end{figure}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l}
+\toprule
+ strategy             \\
+\midrule
+ pipeline\_bubble\_gate \\
+ lut\_skip             \\
+\bottomrule
+\end{tabular}
+\caption{Specializations of FillOptimizer}
+\label{tab:FillOptimizer_specializations}
+\end{table}
 
 \section{SAF microarchitectures}
 
