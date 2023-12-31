@@ -1,356 +1,176 @@
-@preamble{ "\newcommand{\noopsort}[1]{} "
-	# "\newcommand{\printfirst}[2]{#1} "
-	# "\newcommand{\singleletter}[1]{#1} "
-	# "\newcommand{\switchargs}[2]{#2#1} " }
-
-@ARTICLE{article-minimal,
-   author = {L[eslie] A. Aamport},
-   title = {The Gnats and Gnus Document Preparation System},
-   journal = {\mbox{G-Animal's} Journal},
-   year = 1986,
+@misc{hanintro,
+  title = {TinyML and
+Efficient Deep Learning Computing},
+  howpublished = {\url{https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec01-Introduction.pdf}},
+  note = {Accessed: 2023-05-01}
 }
 
-@ARTICLE{article-full,
-   author = {L[eslie] A. Aamport},
-   title = {The Gnats and Gnus Document Preparation System},
-   journal = {\mbox{G-Animal's} Journal},
-   year = 1986,
-   volume = 41,
-   number = 7,
-   pages = "73+",
-   month = jul,
-   note = "This is a full ARTICLE entry",
+@misc{frameworks,
+  title = {Accelerating Inference Up to 6x Faster in PyTorch with Torch-TensorRT},
+  howpublished = {\url{https://developer.nvidia.com/blog/accelerating-inference-up-to-6x-faster-in-pytorch-with-torch-tensorrt/}},
+  note = {Accessed: 2023-05-01}
 }
 
-The KEY field is here to override the KEY field in the journal being
-cross referenced (so is the NOTE field, in addition to its imparting
-information).
-
-@ARTICLE{article-crossref,
-   crossref = {WHOLE-JOURNAL},
-   key = "",
-   author = {L[eslie] A. Aamport},
-   title = {The Gnats and Gnus Document Preparation System},
-   pages = "73+",
-   note = "This is a cross-referencing ARTICLE entry",
+@misc{ampereblog,
+  title = {Accelerating Inference with Sparsity Using the NVIDIA Ampere Architecture and NVIDIA TensorRT},
+  howpublished = {\url{https://developer.nvidia.com/blog/accelerating-inference-with-sparsity-using-ampere-and-tensorrt/}},
+  note = {Accessed: 2023-05-01}
 }
 
-@ARTICLE{whole-journal,
-   key = "GAJ",
-   journal = {\mbox{G-Animal's} Journal},
-   year = 1986,
-   volume = 41,
-   number = 7,
-   month = jul,
-   note = {The entire issue is devoted to gnats and gnus
-		(this entry is a cross-referenced ARTICLE (journal))},
+@misc{archuarch,
+  title = {Architecture and micro-architecture},
+  howpublished = {\url{https://developer.arm.com/documentation/102404/0200/Architecture-and-micro-architecture}},
+  note = {Accessed: 2023-05-01}
 }
 
-@INBOOK{inbook-minimal,
-   author = "Donald E. Knuth",
-   title = "Fundamental Algorithms",
-   publisher = "Addison-Wesley",
-   year = "{\noopsort{1973b}}1973",
-   chapter = "1.2",
+@misc{archuarch,
+  title = {Architecture and micro-architecture},
+  howpublished = {\url{https://developer.arm.com/documentation/102404/0200/Architecture-and-micro-architecture}},
+  note = {Accessed: 2023-05-01}
 }
 
-@INBOOK{inbook-full,
-   author = "Donald E. Knuth",
-   title = "Fundamental Algorithms",
-   volume = 1,
-   series = "The Art of Computer Programming",
-   publisher = "Addison-Wesley",
-   address = "Reading, Massachusetts",
-   edition = "Second",
-   month = "10~" # jan,
-   year = "{\noopsort{1973b}}1973",
-   type = "Section",
-   chapter = "1.2",
-   pages = "10--119",
-   note = "This is a full INBOOK entry",
+@misc{examplearch,
+      title={ThUnderVolt: Enabling Aggressive Voltage Underscaling and Timing Error Resilience for Energy Efficient Deep Neural Network Accelerators}, 
+      author={Jeff Zhang and Kartheek Rangineni and Zahra Ghodsi and Siddharth Garg},
+      year={2018},
+      eprint={1802.03806},
+      archivePrefix={arXiv},
+      primaryClass={cs.NE}
 }
 
-@INBOOK{inbook-crossref,
-   crossref = "whole-set",
-   title = "Fundamental Algorithms",
-   volume = 1,
-   series = "The Art of Computer Programming",
-   edition = "Second",
-   year = "{\noopsort{1973b}}1973",
-   type = "Section",
-   chapter = "1.2",
-   note = "This is a cross-referencing INBOOK entry",
+@INPROCEEDINGS{accelergy,  author={Wu, Yannan Nellie and Emer, Joel S. and Sze, Vivienne},  booktitle={2019 IEEE/ACM International Conference on Computer-Aided Design (ICCAD)},   title={Accelergy: An Architecture-Level Energy Estimation Methodology for Accelerator Designs},   year={2019},  volume={},  number={},  pages={1-8},  doi={10.1109/ICCAD45719.2019.8942149}}
+
+@inproceedings{extensor,
+author = {Hegde, Kartik and Asghari-Moghaddam, Hadi and Pellauer, Michael and Crago, Neal and Jaleel, Aamer and Solomonik, Edgar and Emer, Joel and Fletcher, Christopher W.},
+title = {ExTensor: An Accelerator for Sparse Tensor Algebra},
+year = {2019},
+isbn = {9781450369381},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3352460.3358275},
+doi = {10.1145/3352460.3358275},
+booktitle = {Proceedings of the 52nd Annual IEEE/ACM International Symposium on Microarchitecture},
+pages = {319–333},
+numpages = {15},
+keywords = {Tensor Algebra, Sparse Computation, Hardware Acceleration},
+location = {Columbus, OH, USA},
+series = {MICRO '52}
 }
 
-@BOOK{book-minimal,
-   author = "Donald E. Knuth",
-   title = "Seminumerical Algorithms",
-   publisher = "Addison-Wesley",
-   year = "{\noopsort{1973c}}1981",
+@article{scnn,
+author = {Parashar, Angshuman and Rhu, Minsoo and Mukkara, Anurag and Puglielli, Antonio and Venkatesan, Rangharajan and Khailany, Brucek and Emer, Joel and Keckler, Stephen and Dally, William},
+year = {2017},
+month = {05},
+pages = {},
+title = {SCNN: An Accelerator for Compressed-sparse Convolutional Neural Networks},
+volume = {45},
+journal = {ACM SIGARCH Computer Architecture News},
+doi = {10.1145/3140659.3080254}
 }
 
-@BOOK{book-full,
-   author = "Donald E. Knuth",
-   title = "Seminumerical Algorithms",
-   volume = 2,
-   series = "The Art of Computer Programming",
-   publisher = "Addison-Wesley",
-   address = "Reading, Massachusetts",
-   edition = "Second",
-   month = "10~" # jan,
-   year = "{\noopsort{1973c}}1981",
-   note = "This is a full BOOK entry",
+@INPROCEEDINGS{timeloop,  author={Parashar, Angshuman and Raina, Priyanka and Shao, Yakun Sophia and Chen, Yu-Hsin and Ying, Victor A. and Mukkara, Anurag and Venkatesan, Rangharajan and Khailany, Brucek and Keckler, Stephen W. and Emer, Joel},  booktitle={2019 IEEE International Symposium on Performance Analysis of Systems and Software (ISPASS)},   title={Timeloop: A Systematic Approach to DNN Accelerator Evaluation},   year={2019},  volume={},  number={},  pages={304-315},  doi={10.1109/ISPASS.2019.00042}}
+
+@INPROCEEDINGS{sparseloop,  author={Wu, Yannan Nellie and Tsai, Po-An and Parashar, Angshuman and Sze, Vivienne and Emer, Joel S.},  booktitle={2021 IEEE International Symposium on Performance Analysis of Systems and Software (ISPASS)},   title={Sparseloop: An Analytical, Energy-Focused Design Space Exploration Methodology for Sparse Tensor Accelerators},   year={2021},  volume={},  number={},  pages={232-234},  doi={10.1109/ISPASS51385.2021.00043}}
+
+@inproceedings{sparten,
+author = {Gondimalla, Ashish and Chesnut, Noah and Thottethodi, Mithuna and Vijaykumar, T. N.},
+title = {SparTen: A Sparse Tensor Accelerator for Convolutional Neural Networks},
+year = {2019},
+isbn = {9781450369381},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3352460.3358291},
+doi = {10.1145/3352460.3358291},
+booktitle = {Proceedings of the 52nd Annual IEEE/ACM International Symposium on Microarchitecture},
+pages = {151–165},
+numpages = {15},
+keywords = {Sparse tensors, Convolutional neural networks, Accelerators},
+location = {Columbus, OH, USA},
+series = {MICRO '52}
 }
 
-@BOOK{book-crossref,
-   crossref = "whole-set",
-   title = "Seminumerical Algorithms",
-   volume = 2,
-   series = "The Art of Computer Programming",
-   edition = "Second",
-   year = "{\noopsort{1973c}}1981",
-   note = "This is a cross-referencing BOOK entry",
+@inproceedings{gamma,
+author = {Zhang, Guowei and Attaluri, Nithya and Emer, Joel S. and Sanchez, Daniel},
+title = {Gamma: Leveraging Gustavson’s Algorithm to Accelerate Sparse Matrix Multiplication},
+year = {2021},
+isbn = {9781450383172},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3445814.3446702},
+doi = {10.1145/3445814.3446702},
+booktitle = {Proceedings of the 26th ACM International Conference on Architectural Support for Programming Languages and Operating Systems},
+pages = {687–701},
+numpages = {15},
+keywords = {explicit data orchestration, accelerator, high-radix merge, data movement reduction, sparse linear algebra, sparse matrix multiplication, Gustavson's algorithm},
+location = {Virtual, USA},
+series = {ASPLOS 2021}
 }
 
-@BOOK{whole-set,
-   author = "Donald E. Knuth",
-   publisher = "Addison-Wesley",
-   title = "The Art of Computer Programming",
-   series = "Four volumes",
-   year = "{\noopsort{1973a}}{\switchargs{--90}{1968}}",
-   note = "Seven volumes planned (this is a cross-referenced set of BOOKs)",
+@INPROCEEDINGS{matraptor,  author={Srivastava, Nitish and Jin, Hanchen and Liu, Jie and Albonesi, David and Zhang, Zhiru},  booktitle={2020 53rd Annual IEEE/ACM International Symposium on Microarchitecture (MICRO)},   title={MatRaptor: A Sparse-Sparse Matrix Multiplication Accelerator Based on Row-Wise Product},   year={2020},  volume={},  number={},  pages={766-780},  doi={10.1109/MICRO50266.2020.00068}}
+
+@ARTICLE{eyerissv2,  author={Chen, Yu-Hsin and Yang, Tien-Ju and Emer, Joel and Sze, Vivienne},  journal={IEEE Journal on Emerging and Selected Topics in Circuits and Systems},   title={Eyeriss v2: A Flexible Accelerator for Emerging Deep Neural Networks on Mobile Devices},   year={2019},  volume={9},  number={2},  pages={292-308},  doi={10.1109/JETCAS.2019.2910232}}
+
+@INPROCEEDINGS{sigma,  author={Qin, Eric and Samajdar, Ananda and Kwon, Hyoukjun and Nadella, Vineet and Srinivasan, Sudarshan and Das, Dipankar and Kaul, Bharat and Krishna, Tushar},  booktitle={2020 IEEE International Symposium on High Performance Computer Architecture (HPCA)},   title={SIGMA: A Sparse and Irregular GEMM Accelerator with Flexible Interconnects for DNN Training},   year={2020},  volume={},  number={},  pages={58-70},  doi={10.1109/HPCA47549.2020.00015}}
+
+@INPROCEEDINGS{dsstc,  author={Wang, Yang and Zhang, Chen and Xie, Zhiqiang and Guo, Cong and Liu, Yunxin and Leng, Jingwen},  booktitle={2021 ACM/IEEE 48th Annual International Symposium on Computer Architecture (ISCA)},   title={Dual-side Sparse Tensor Core},   year={2021},  volume={},  number={},  pages={1083-1095},  doi={10.1109/ISCA52012.2021.00088}}
+
+@inproceedings{candles,
+  title={CANDLES: Channel-Aware Novel Dataflow-Microarchitecture Co-Design for Low Energy Sparse Neural Network Acceleration},
+  author={Sumanth Gudaparthi and Sarabjeet Singh},
+  year={2021}
 }
 
-@BOOKLET{booklet-minimal,
-   key = "Kn{\printfirst{v}{1987}}",
-   title = "The Programming of Computer Art",
+@INPROCEEDINGS{sparch,  author={Zhang, Zhekai and Wang, Hanrui and Han, Song and Dally, William J.},  booktitle={2020 IEEE International Symposium on High Performance Computer Architecture (HPCA)},   title={SpArch: Efficient Architecture for Sparse Matrix Multiplication},   year={2020},  volume={},  number={},  pages={261-274},  doi={10.1109/HPCA47549.2020.00030}}
+
+@INPROCEEDINGS{eie,  author={Han, Song and Liu, Xingyu and Mao, Huizi and Pu, Jing and Pedram, Ardavan and Horowitz, Mark A. and Dally, William J.},  booktitle={2016 ACM/IEEE 43rd Annual International Symposium on Computer Architecture (ISCA)},   title={EIE: Efficient Inference Engine on Compressed Deep Neural Network},   year={2016},  volume={},  number={},  pages={243-254},  doi={10.1109/ISCA.2016.30}}
+
+@INPROCEEDINGS{outerspace,  author={Pal, Subhankar and Beaumont, Jonathan and Park, Dong-Hyeon and Amarnath, Aporva and Feng, Siying and Chakrabarti, Chaitali and Kim, Hun-Seok and Blaauw, David and Mudge, Trevor and Dreslinski, Ronald},  booktitle={2018 IEEE International Symposium on High Performance Computer Architecture (HPCA)},   title={OuterSPACE: An Outer Product Based Sparse Matrix Multiplication Accelerator},   year={2018},  volume={},  number={},  pages={724-736},  doi={10.1109/HPCA.2018.00067}}
+
+@article{szebook,
+  title={Efficient processing of deep neural networks},
+  author={Sze, Vivienne and Chen, Yu-Hsin and Yang, Tien-Ju and Emer, Joel S},
+  journal={Synthesis Lectures on Computer Architecture},
+  volume={15},
+  number={2},
+  pages={1--341},
+  year={2020},
+  publisher={Morgan \& Claypool Publishers}
 }
 
-@BOOKLET{booklet-full,
-   author = "Jill C. Knvth",
-   title = "The Programming of Computer Art",
-   howpublished = "Vernier Art Center",
-   address = "Stanford, California",
-   month = feb,
-   year = 1988,
-   note = "This is a full BOOKLET entry",
+@inproceedings{eyeriss,
+    author      = {{Chen, Yu-Hsin and Krishna, Tushar and Emer, Joel and Sze, Vivienne}},
+    title       = {{Eyeriss: An Energy-Efficient Reconfigurable Accelerator for Deep Convolutional Neural Networks}},
+    booktitle   = {{IEEE International Solid-State Circuits Conference, ISSCC 2016, Digest of Technical Papers}},
+    year        = {2016},
+    pages       = {{262-263}},
 }
 
-@INCOLLECTION{incollection-minimal,
-   author = "Daniel D. Lincoll",
-   title = "Semigroups of Recurrences",
-   booktitle = "High Speed Computer and Algorithm Organization",
-   publisher = "Academic Press",
-   year = 1977,
+@techreport{ampere,
+     title = {{NVIDIA AMPERE GA102 GPU 
+ARCHITECTURE}},
+     institution = {NVIDIA},
 }
 
-@INCOLLECTION{incollection-full,
-   author = "Daniel D. Lincoll",
-   title = "Semigroups of Recurrences",
-   editor = "David J. Lipcoll and D. H. Lawrie and A. H. Sameh",
-   booktitle = "High Speed Computer and Algorithm Organization",
-   number = 23,
-   series = "Fast Computers",
-   chapter = 3,
-   type = "Part",
-   pages = "179--183",
-   publisher = "Academic Press",
-   address = "New York",
-   edition = "Third",
-   month = sep,
-   year = 1977,
-   note = "This is a full INCOLLECTION entry",
+@inproceedings{pruning,
+  title={Optimal Brain Damage},
+  author={Yann LeCun and John S. Denker and Sara A. Solla},
+  booktitle={NIPS},
+  year={1989}
 }
 
-@INCOLLECTION{incollection-crossref,
-   crossref = "whole-collection",
-   author = "Daniel D. Lincoll",
-   title = "Semigroups of Recurrences",
-   pages = "179--183",
-   note = "This is a cross-referencing INCOLLECTION entry",
-}
-
-@BOOK{whole-collection,
-   editor = "David J. Lipcoll and D. H. Lawrie and A. H. Sameh",
-   title = "High Speed Computer and Algorithm Organization",
-   booktitle = "High Speed Computer and Algorithm Organization",
-   number = 23,
-   series = "Fast Computers",
-   publisher = "Academic Press",
-   address = "New York",
-   edition = "Third",
-   month = sep,
-   year = 1977,
-   note = "This is a cross-referenced BOOK (collection) entry",
-}
-
-@MANUAL{manual-minimal,
-   key = "Manmaker",
-   title = "The Definitive Computer Manual",
-}
-
-@MANUAL{manual-full,
-   author = "Larry Manmaker",
-   title = "The Definitive Computer Manual",
-   organization = "Chips-R-Us",
-   address = "Silicon Valley",
-   edition = "Silver",
-   month = apr # "-" # may,
-   year = 1986,
-   note = "This is a full MANUAL entry",
-}
-
-@MASTERSTHESIS{mastersthesis-minimal,
-   author = "{\'{E}}douard Masterly",
-   title = "Mastering Thesis Writing",
-   school = "Stanford University",
-   year = 1988,
-}
-
-@MASTERSTHESIS{mastersthesis-full,
-   author = "{\'{E}}douard Masterly",
-   title = "Mastering Thesis Writing",
-   school = "Stanford University",
-   type = "Master's project",
-   address = "English Department",
-   month = jun # "-" # aug,
-   year = 1988,
-   note = "This is a full MASTERSTHESIS entry",
-}
-
-@MISC{misc-minimal,
-   key = "Missilany",
-   note = "This is a minimal MISC entry",
-}
-
-@MISC{misc-full,
-   author = "Joe-Bob Missilany",
-   title = "Handing out random pamphlets in airports",
-   howpublished = "Handed out at O'Hare",
-   month = oct,
-   year = 1984,
-   note = "This is a full MISC entry",
-}
-
-@STRING{STOC-key = "OX{\singleletter{stoc}}"}
-
-@STRING{ACM = "The OX Association for Computing Machinery"}
-
-@STRING{STOC = " Symposium on the Theory of Computing"}
-
-@INPROCEEDINGS{inproceedings-minimal,
-   author = "Alfred V. Oaho and Jeffrey D. Ullman and Mihalis Yannakakis",
-   title = "On Notions of Information Transfer in {VLSI} Circuits",
-   booktitle = "Proc. Fifteenth Annual ACM" # STOC,
-   year = 1983,
-}
-
-@INPROCEEDINGS{inproceedings-full,
-   author = "Alfred V. Oaho and Jeffrey D. Ullman and Mihalis Yannakakis",
-   title = "On Notions of Information Transfer in {VLSI} Circuits",
-   editor = "Wizard V. Oz and Mihalis Yannakakis",
-   booktitle = "Proc. Fifteenth Annual ACM" # STOC,
-   number = 17,
-   series = "All ACM Conferences",
-   pages = "133--139",
-   month = mar,
-   year = 1983,
-   address = "Boston",
-   organization = ACM,
-   publisher = "Academic Press",
-   note = "This is a full INPROCEDINGS entry",
-}
-
-@INPROCEEDINGS{inproceedings-crossref,
-   crossref = "whole-proceedings",
-   author = "Alfred V. Oaho and Jeffrey D. Ullman and Mihalis Yannakakis",
-   title = "On Notions of Information Transfer in {VLSI} Circuits",
-   organization = "",
-   pages = "133--139",
-   note = "This is a cross-referencing INPROCEEDINGS entry",
-}
-
-@PROCEEDINGS{proceedings-minimal,
-   key = STOC-key,
-   title = "Proc. Fifteenth Annual" # STOC,
-   year = 1983,
-}
-
-@PROCEEDINGS{proceedings-full,
-   editor = "Wizard V. Oz and Mihalis Yannakakis",
-   title = "Proc. Fifteenth Annual" # STOC,
-   number = 17,
-   series = "All ACM Conferences",
-   month = mar,
-   year = 1983,
-   address = "Boston",
-   organization = ACM,
-   publisher = "Academic Press",
-   note = "This is a full PROCEEDINGS entry",
-}
-
-@PROCEEDINGS{whole-proceedings,
-   key = STOC-key,
-   organization = ACM,
-   title = "Proc. Fifteenth Annual" # STOC,
-   address = "Boston",
-   year = 1983,
-   booktitle = "Proc. Fifteenth Annual ACM" # STOC,
-   note = "This is a cross-referenced PROCEEDINGS",
-}
-
-@PHDTHESIS{phdthesis-minimal,
-   author = "F. Phidias Phony-Baloney",
-   title = "Fighting Fire with Fire: Festooning {F}rench Phrases",
-   school = "Fanstord University",
-   year = 1988,
-}
-
-@PHDTHESIS{phdthesis-full,
-   author = "F. Phidias Phony-Baloney",
-   title = "Fighting Fire with Fire: Festooning {F}rench Phrases",
-   school = "Fanstord University",
-   type = "{PhD} Dissertation",
-   address = "Department of French",
-   month = jun # "-" # aug,
-   year = 1988,
-   note = "This is a full PHDTHESIS entry",
-}
-
-@TECHREPORT{techreport-minimal,
-   author = "Tom Terrific",
-   title = "An {$O(n \log n / \! \log\log n)$} Sorting Algorithm",
-   institution = "Fanstord University",
-   year = 1988,
-}
-
-@TECHREPORT{techreport-full,
-   author = "Tom T{\'{e}}rrific",
-   title = "An {$O(n \log n / \! \log\log n)$} Sorting Algorithm",
-   institution = "Fanstord University",
-   type = "Wishful Research Result",
-   number = "7",
-   address = "Computer Science Department, Fanstord, California",
-   month = oct,
-   year = 1988,
-   note = "This is a full TECHREPORT entry",
-}
-
-@UNPUBLISHED{unpublished-minimal,
-   author = "Ulrich {\"{U}}nderwood and Ned {\~N}et and Paul {\={P}}ot",
-   title = "Lower Bounds for Wishful Research Results",
-   note = "Talk at Fanstord University (this is a minimal UNPUBLISHED entry)",
-}
-
-@UNPUBLISHED{unpublished-full,
-   author = "Ulrich {\"{U}}nderwood and Ned {\~N}et and Paul {\={P}}ot",
-   title = "Lower Bounds for Wishful Research Results",
-   month = nov # ", " # dec,
-   year = 1988,
-   note = "Talk at Fanstord University (this is a full UNPUBLISHED entry)",
-}
-
-@MISC{random-note-crossref,
-   key = {Volume-2},
-   note = "Volume~2 is listed under Knuth \cite{book-full}"
+@inproceedings{mergertaxo,
+author = {Wang, Bangyan and Deng, Lei and Sun, Fei and Dai, Guohao and Liu, Liu and Wang, Yu and Xie, Yuan},
+title = {A One-for-All and <i>o</i>(<i>v</i> Log(<i>v</i> ))-Cost Solution for Parallel Merge Style Operations on Sorted Key-Value Arrays},
+year = {2022},
+isbn = {9781450392051},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3503222.3507728},
+doi = {10.1145/3503222.3507728},
+booktitle = {Proceedings of the 27th ACM International Conference on Architectural Support for Programming Languages and Operating Systems},
+pages = {669–682},
+numpages = {14},
+keywords = {Join, Graph, SpGEMM, Sparse linear algebra, SIMD, Key-value array, Merge sort},
+location = {Lausanne, Switzerland},
+series = {ASPLOS 2022}
 }

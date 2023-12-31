@@ -33,6 +33,12 @@
 \usepackage[T1]{fontenc}
 \pagestyle{plain}
 
+% ABF custom packages
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{float}
+\newcommand\todo[1]{\textcolor{red}{#1}}
+
 %% This bit allows you to either specify only the files which you wish to
 %% process, or `all' to process all files which you \include.
 %% Krishna Sethuraman (1990).
@@ -50,8 +56,15 @@
 % \include{signature}
 \pagestyle{plain}
 \include{contents}
-\include{chap1}
-\include{chap2}
+\include{intro}
+\include{background}
+\include{characterization}
+\include{saf_taxonomy}
+\include{saftools_overview}
+\include{saftools_framework}
+\include{evaluation} 
+\include{case_studies}
+\include{conclusion}
 \appendix
 \include{appa}
 \include{appb}

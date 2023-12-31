@@ -1,0 +1,154 @@
+\chapter{Background and motivation}
+
+Sparseloop\cite{sparseloop} developed a unified taxonomy of Sparse Acceleration Features (SAFs), optimization strategies for exploiting sparsity (zero-sparsity) to conserve energy and cycles. A SAF is a strictly declarative description of an optimization, comprising (1) a description of the optimization outcome, and (2) a set of attributes which modulate the outcome of the optimization. A SAF describes neither the microarchitectural implementation of the optimization, nor the interfaces or communication protocols involved in integrating the microarchitectural implementation into the design. 
+
+Nonetheless, a real design would require a microarchitectural change which implements the optimization, referred to here as the \textit{SAF microarchitecture.} Existing analytical modeling tools\cite{sparseloop} model only the benefits of exploiting SAFs (savings on memory capacity, fewer memory accesses, fewer compute cycles); these benefits are introduced in Section~\ref{background:safs}. These tools avoid modeling the costs of SAF microarchitectures by assuming (1) an ideal SAF microarchitecture which perfectly implements the SAF, and (2) a SAF microarchitecture with negligible energy and area overhead.
+
+Section~\ref{background:saf_uarch} demonstrates that SAF microarchitectures can \textit{sometimes} have significant implications for the design and modeling of sparse tensor accelerators. Thus, this work is motivated by the need to create novel SAF microarchitecture models.
+%
+% SAFs subsection
+%
+\section{SAFs}
+\label{background:safs}
+
+This section will review and motivate the two broad SAF categories. Table~\ref{tab:design_specific_models} provides examples of how SAFs are used in prior research.
+
+%
+% Figure: examples of action optimizations
+%
+\begin{figure*}[h]
+\includegraphics[width=\textwidth]{figures/saf_action_optimizations.PNG}
+\caption{An example of dot-product optimized with zero-gating and zero-skipping to save cycles and energy, versus the naive un-optimized approach. The zero-skipping optimization's efficacy may depend on the choice of leader-follower skipping vs bidirectional skipping.}
+\label{fig:saf_action_optimizations}
+\end{figure*}
+%
+% Table: Action SAFs, comparison of perf and energy
+%
+\begin{table*}[ht]
+\begin{tabular}{c|c|c|}
+ & Cycles & Energy \\ \hline \hline
+Theoretical &  \textcolor{green}{\textbf{1}} & \textcolor{green}{\textbf{$E_{mac}$}}\\ \hline
+Naive &  \textcolor{red}{\textbf{5}} & \textcolor{red}{\textbf{$5 E_{mac}$}}\\ \hline
+Zero-gating &  \textcolor{red}{\textbf{5}} & \textcolor{green}{\textbf{$E_{mac}$}} \\ \hline
+Zero-skipping (leader-follower) & \textcolor{red}{\textbf{2}} & \textcolor{red}{\textbf{$2 E_{mac}$}} \\ \hline
+Zero-skipping (bidirectional) & \textcolor{green}{\textbf{1}} & \textcolor{green}{\textbf{$E_{mac}$}} \\ \hline
+\end{tabular}
+\caption{Dot-product cycles and energy with different action-optimization strategies applied to the PE in Figure \ref{fig:saf_action_optimizations}, versus the theoretical-best. Energy is measured in multiples of the energy of a single MAC, $E_{mac}$}
+\label{tab:action_saf_comparison}
+\centering
+\end{table*}
+%
+% Content: SAFs
+%
+
+%
+\todo{impact on memory; more concise - table shows memory and mac energy, paragraph concisely introduces each action optimization. Clarify that skipping is architecturally one or both operands being skipped in response to the other.}
+
+
+\subsection{Action optimizations}
+
+These are SAFs which signify that the tensor accelerator detects and optimizes away ineffectual operations such as $0 \times 0 = 0$ and $0 \times a = 0$, with the goal of saving energy and potentially compute cycles. Figure \ref{fig:saf_action_optimizations} compares action optimization cost for a dot-product problem mapped to a simple PE with two buffers and a MAC unit which consumes $E_{mac}$ per operation. Theoretically only one cycle and $E_{mac}$ energy should be required to multiply $a_0 \times b_0$; there are no other effectual MAC operations. Table \ref{tab:action_saf_comparison} shows that a "naive" PE design with no action optimization SAFs underperforms on both cycles and energy by $5\times$, and Figure \ref{fig:saf_action_optimizations} shows that the cause is ineffectual MACs being performed. \textit{Zero-gating} (or \textit{gating}) conserves $E_{mac}$ energy per ineffectual MAC since the MAC unit idles for a cycle. In other words there is no conservation of cycles for ineffectual operations, only energy. \textit{Zero-skipping} (or \textit{skipping}) conserves $E_{mac}$ per ineffectual MAC, but does so by skipping immediately to the next one - thus both energy and time are saved by skipping. 
+
+Designs with \textit{bidirectional action optimizations} do not perform a MAC when either operand is zero. Thus 100\% of gating or skipping opportunities are exploited, depending on the type of action optimization. Designs with \textit{leader-follower action optimizations} respond only to the designated leader operand being zero, in which case both the MAC and the follower memory access are skipped or gated.
+
+Figure~\ref{todo} summarizes the attributes of action optimizations. The key attribute for both skipping and gating action optimizations is direction (\textit{bidirectional} vs \textit{leader-follower}.)
+
+%
+\subsection{Format optimizations}
+
+The zero-compression (or \textit{format}) SAF discards ineffectual zero-valued tensor elements in order to save memory capacity at rest and memory bandwidth during acceses. The remaining nonzero values' positions in memory no longer align with the original coordinates, so the compressed format requires metadata which may be used to recover an element's uncompressed coordinate as efficiently as possible (Figure \ref{fig:saf_format_optimizations}.) 
+
+Figure~\ref{todo} summarizes the three representation formats utilized in this work, derived from the definitions in the Sparseloop\cite{sparseloop} paper:
+
+\begin{itemize}
+    \item \textbf{Uncompressed (U)} - U represents a vector as it exists in memory without any compression, including zero-value elements. The sparse tensor architectures which we consider here, will typically eschew U in favor of a compressed format.
+    \item \textbf{Uncompressed Offset Pairs (UOP)} - UOP 
+    \item \textbf{Coordinate Payload (C)}
+    \item \textbf{Bitmask (B)}
+\end{itemize}
+
+\subsection{Use of SAFs in prior research}
+
+%
+% Figure: examples of format optimizations
+%
+\begin{figure}[h]
+\includegraphics[width=8cm]{figures/saf_format_optimizations.PNG}
+\caption{A visualization of a compressed representation format (coordinate-payload or CP) applied to a vector with some zero entries. The compressed representation is reduced to nonzero values and metadata which recovers the original data structure.}
+\label{fig:saf_format_optimizations}
+\end{figure}
+%
+% Content: format optimizations
+%
+
+%
+% Figure: combined action/format optimizations
+%
+\begin{figure}[h]
+\includegraphics[width=4cm]{figures/saf_action_format_combo.PNG}
+\caption{An example of dot-product optimized with both bidirectional zero-skipping and a compressed representation format. Conceptually corresponding nonzero values must be matched using a component which processes format metadata in order to implement skipping, which is called an \textit{intersection unit.} The cost of the skipping optimization is the energy, area and latency of the skipping microarchitecture, which comprises the intersection unit.}
+\label{fig:saf_action_format_combo}
+\centering
+\end{figure}
+%
+% Figure: architecture example
+%
+\begin{figure}[h]
+\includegraphics[width=8cm]{figures/arch_example.PNG}
+\caption{A tensor accelerator \textit{architecture} (Thunderbolt architecture, figure from \cite{examplearch}.)}
+\label{fig:saf_format_optimizations}
+\end{figure}
+%
+% Figure: microarchitecture example
+%
+\begin{figure}[h]
+\includegraphics[width=8cm]{figures/uarch_example.PNG}
+\caption{Tensor accelerator \textit{microarchitecture} (Eyeriss v2 NoC switch, figure from \cite{eyerissv2}.)}
+\label{fig:saf_format_optimizations}
+\end{figure}
+%
+% Figure: SAFs can be significant or not, it depends on the microarchitecture
+%
+\begin{figure*}[ht]
+\includegraphics[width=\textwidth]{figures/saf_uarch_significance.PNG}
+\caption{Breakdown of sparse tensor accelerator PE area based on published RTL simulations for a representative sample of designs. The total area of PE architectural components is a decent model of Eyeriss v2\cite{eyerissv2} PE area because Eyeriss v2's simple leader-follower zero-skipping microarchitecture has negligible area. SparTen\cite{sparten} employs a complex zero-skipping microarchitecture which must process high-throughput bitmask metadata. GAMMA's\cite{gamma} PE coordinates loop-nest re-ordering with tensor layout shuffling while the data is in-flight, using a high-radix merger component. These complex microarchitectures create discrepancies against architectural PE models.}
+\label{fig:saf_uarch_significance}
+\centering
+\end{figure*}
+%
+% Figure: prior work
+%
+\begin{table*}[ht]
+\begin{tabular}{c|c|}
+\textbf{Accelerator} & \textbf{SAF microarchitecture proposals} \\ \hline \hline
+Eyeriss &  MAC gating; in-flight RLE decompression \\ \hline
+Eyeriss v2 & CSC zero-skipping \\ \hline
+ExTensor & Hierarchical bidirectional zero-skipping \\ \hline
+SCNN & Memory conflict handling (binning output coordinates) \\ \hline
+SparTen & Bitmask zero-skipping, parallel compression, memory conflict handling \\ \hline
+OuterSPACE & Software rank-swap \\ \hline
+GAMMA & Leader-following intersection, hardware rank-swap \\ \hline
+\end{tabular}
+\caption{A non-exhaustive list of published tensor accelerators and their proposed SAF microarchitectures.}
+\label{tab:design_specific_models}
+\centering
+\end{table*}
+
+\section{SAF microarchitectures}
+
+Prior research on sparse tensor acclerators proposes many different SAF microarchitectures, without employing a consistent set of abstractions and models in order to explore the design space or make comparisons. However, the breakdown of PE area for several accelerator designs in Figure~\ref{fig:saf_uarch_significance} shows that it is not always safe to assume SAF microarchitecture overhead is insignificant, and so it is important to choose SAFs and SAF microarchitecture designs systematically to minimize cost.
+
+The Eyeriss v2\cite{eyerissv2} PE implements a leader-follower skipping SAF, devoting only 8\% of its PE area to the skipping microarchitecture. This is owing to a lightweight leader-follower skipping microarchitecture which operates on sparse weights and activations in Compressed-Sparse Column (CSC) format. 
+
+In contrast, the SparTen\cite{sparten} accelerator PE uses most of its PE area for the bidirectional skipping microarchitecture which operates on Bitmask-format metadata. As will be shown later, this is attributable to the substantial load-handling capability which the skipping microarchitecture must have in order to maintain high arithmetic hardware utilization. 
+
+As a final example, the GAMMA\cite{gamma} accelerator PE devotes 30\% of its PE area - a significant amount - in order to apply a rank swap\footnote{Here, rank swap is used to refer to transposition of the traversal-order of tensor ranks, as described in\cite{TODO}.}. The PE employs a row-wise product dataflow for loading CSR-format GEMM ($C_{M\times N} = A_{M\times K} \times B_{K\times N}$) operands from memory. A single $A_{M\times K}$ element and a row of $B_{K\times N}$ elements are loaded from on-chip memory into the PE; this reflects that the $N$ rank of B is traversed in the inner-most loop, while the contracted $K$ rank is traversed at an intermediate loop level. Row-wise product enables a cheap leader-follower skipping microarchitecture to be employed for loading $B_{K\times N}$ rows conditional on non-zero $A_{M\times K}$ elements. Upon receiving $A_{M\times K}$ and $B_{K\times N}$ values from memory, the GAMMA PE implements a rank-swap which moves the contracted dimension $K$ into the innermost loop. This enables inner-product accumulation into a single PE output register. The output memory footprint saved by the rank-swap is significant: a design such as MatRaptor\cite{matraptor} which implements row-wise product \textit{without} a rank-swap must store and incrementally accumulate $|K|$ rows of partial outputs, each of size $1 \times |N|$, requiring increased output memory footprint. Given the benefit of rank-swap, is there a tradeoff involved in using it? The use of CSR in GAMMA, means thank rank-swap requires a merge primitive (analogous to the merge operation in mergesort) in order to sort $B_{K\times N}$ operand data first by $K$ coordinate metadata, and then by $N$ coordinate metadata, effectively implementing a transpose. GAMMA employs a radix-64 merge unit\cite{gamma} in order to do this. Although the rank-swap itself is not a sparse optimization, nonetheless the need for this type of merge unit results from employing a rank-swapped dataflow \textit{in the context of employing CSR format for the $B_{K\times N}$ operand}. Thus it is justifiable to say that the merge unit is part of the format microarchitecture which implements the CSR format SAF. It is this format microarchitecture which accounts for 30\% of PE area in GAMMA.
+
+Clearly, SAFs and SAF microarchitecture designs are complex and impactful design decisions, and it is desirable to know whether a particular combination of SAFs will lead to the substantial PE implementation overhead seen (for example) in SparTen and GAMMA. The rest of this work develops a conceptual framework for taxonomy and modeling of SAF microarchitectures. This conceptual framework can be represented in software and utilized for make SAF microarchitecture design decisions using analytical pre-RTL modeling tools.
+
+%\subsection{Smartbuffer model and Format microarchitecture}
+%\subsubsection{Dense smartbuffer}
+%\subsubsection{Sparse smartbuffer}
+%\subsubsection{Format interfaces}
+
+\label{background:saf_uarch}
