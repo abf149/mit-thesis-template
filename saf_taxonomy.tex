@@ -21,8 +21,8 @@ This section will overview the taxonomy of microarchitectural primitive componen
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{figures/mdparser.png}
-    \caption{Metadata parser.}
+    \includegraphics[width=0.95\textwidth]{figures/mdparser.png}
+    \caption{Metadata parser primitive component template.}
     \label{fig:mdparser}
 \end{figure}
 
@@ -32,21 +32,21 @@ This section will overview the taxonomy of microarchitectural primitive componen
 \toprule
  format   & strategy       & coordinate\_arithmetic   \\
 \midrule
- U        & no\_arithmetic  & sentinel                \\
- U        & yes\_arithmetic & sentinel                \\
- U        & no\_arithmetic  & length\_field            \\
- U        & yes\_arithmetic & length\_field            \\
- C        & no\_arithmetic  & sentinel                \\
- C        & yes\_arithmetic & sentinel                \\
- C        & no\_arithmetic  & length\_field            \\
- C        & yes\_arithmetic & length\_field            \\
- B        & no\_arithmetic  & sentinel                \\
- B        & yes\_arithmetic & sentinel                \\
- B        & no\_arithmetic  & length\_field            \\
- B        & yes\_arithmetic & length\_field            \\
+ U        & sentinel & no\_arithmetic                \\
+ U        & sentinel & yes\_arithmetic                 \\
+ U        & length\_field & no\_arithmetic              \\
+ U        & length\_field & yes\_arithmetic             \\
+ C        & sentinel & no\_arithmetic                \\
+ C        & sentinel & yes\_arithmetic                 \\
+ C        & length\_field & no\_arithmetic              \\
+ C        & length\_field & yes\_arithmetic             \\
+ B        & sentinel & no\_arithmetic                  \\
+ B        & sentinel & yes\_arithmetic                 \\
+ B        & length\_field & no\_arithmetic              \\
+ B        & length\_field & yes\_arithmetic             \\
 \bottomrule
 \end{tabular}
-\caption{Specializations of MetadataParser}
+\caption{Specializations of metadata parsers.}
 \label{tab:MetadataParser_specializations}
 \end{table}
 
@@ -56,8 +56,8 @@ This section will overview the taxonomy of microarchitectural primitive componen
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{figures/pgen1.png}
-    \caption{Single position generator.}
+    \includegraphics[width=0.95\textwidth]{figures/pgen1.png}
+    \caption{Single position generator primitive component template.}
     \label{fig:pgen1}
 \end{figure}
 
@@ -68,10 +68,10 @@ This section will overview the taxonomy of microarchitectural primitive componen
  format\_src   & format\_dst   & strategy    \\
 \midrule
  C            & U            & passthrough \\
- C            & U            & counter     \\
+ C            & C            & counter     \\
 \bottomrule
 \end{tabular}
-\caption{Specializations of SinglePositionGenerator}
+\caption{Specializations of single position-generator}
 \label{tab:SinglePositionGenerator_specializations}
 \end{table}
 
@@ -79,8 +79,8 @@ This section will overview the taxonomy of microarchitectural primitive componen
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{figures/pgen2.png}
-    \caption{Dual position generator.}
+    \includegraphics[width=0.95\textwidth]{figures/pgen2.png}
+    \caption{Dual position generator primitive component template.}
     \label{fig:pgen2}
 \end{figure}
 
@@ -94,8 +94,8 @@ This section will overview the taxonomy of microarchitectural primitive componen
  B            & B            & kogge\_stone\_prefix\_sum & parallel\_dec2\_priority\_encoder \\
 \bottomrule
 \end{tabular}
-\caption{Specializations of DoublePositionGenerator}
-\label{tab:DoublePositionGenerator_specializations}
+\caption{Specializations of dual position generator}
+\label{tab:DualPositionGenerator_specializations}
 \end{table}
 
 \subsection{Intersection units}
@@ -104,9 +104,9 @@ This section will overview the taxonomy of microarchitectural primitive componen
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{figures/isectlf.png}
-    \caption{Leader-follower intersection unit.}
-    \label{fig:fopt}
+    \includegraphics[width=0.95\textwidth]{figures/isectlf.png}
+    \caption{Leader-follower intersection primitive component template.}
+    \label{fig:isectlf}
 \end{figure}
 
 \begin{table}[H]
@@ -120,7 +120,7 @@ This section will overview the taxonomy of microarchitectural primitive componen
  R               & passthrough \\
 \bottomrule
 \end{tabular}
-\caption{Specializations of IntersectionLeaderFollower}
+\caption{Specializations of leader-follower intersection.}
 \label{tab:IntersectionLeaderFollower_specializations}
 \end{table}
 
@@ -128,9 +128,9 @@ This section will overview the taxonomy of microarchitectural primitive componen
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{figures/isectbd.png}
-    \caption{Fill optimizer.}
-    \label{fig:fopt}
+    \includegraphics[width=0.95\textwidth]{figures/isectbd.png}
+    \caption{Bidirectional intersection primitive component template.}
+    \label{fig:isectbd}
 \end{figure}
 
 \begin{table}[H]
@@ -145,7 +145,7 @@ This section will overview the taxonomy of microarchitectural primitive componen
  B          & B          & bitwise\_and      \\
 \bottomrule
 \end{tabular}
-\caption{Specializations of IntersectionBidirectional}
+\caption{Specializations of bidirectional intersection.}
 \label{tab:IntersectionBidirectional_specializations}
 \end{table}
 
@@ -153,8 +153,8 @@ This section will overview the taxonomy of microarchitectural primitive componen
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{figures/fopt.png}
-    \caption{Fill optimizer.}
+    \includegraphics[width=0.95\textwidth]{figures/fopt.png}
+    \caption{Fill optimizer primitive component template. The fill optimizer's (fopt's) method for discarding payload fills - as well as the interface between the fopt and the payload stream - is highly implementation-dependent, thus the fopt template does not have a ``payload'' interface. The red dotted line from fopt to payload stream is a visual cue for which payload stream is being optimized, but in actuality \textit{pos\_in} is the only interface port defined for this primitive component template.}
     \label{fig:fopt}
 \end{figure}
 
@@ -168,7 +168,7 @@ This section will overview the taxonomy of microarchitectural primitive componen
  lut\_skip             \\
 \bottomrule
 \end{tabular}
-\caption{Specializations of FillOptimizer}
+\caption{Specializations of fill optimizer}
 \label{tab:FillOptimizer_specializations}
 \end{table}
 
@@ -178,4 +178,84 @@ This section will overview the taxonomy of SAF microarchitectures considered in 
 
 \subsection{Format microarchitectures}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/FMT.png}
+    \caption{Format microarchitecture compound component template. If an architectural buffer has a format SAF, a format microarchitecture must be bound to it. The fmt\_list parameter expects a list of rank formats. The architectural buffer keeps\cite{timeloop} one or more dataspaces\cite{timeloop}, at least one of which exploits a format SAF. fmt\_list is assumed to have been derived from concatenating the fiber representation regexes\cite{szebook} for all kept dataspaces' fibertrees, excluding dataspaces which do not exploit a format SAF.}
+    \label{fig:FMT}
+\end{figure}
+
+%\begin{table}[H]
+%\centering
+%\begin{tabular}{l}
+%\toprule
+% fibertree   \\
+%\midrule
+% *           \\
+%\bottomrule
+%\end{tabular}
+%\caption{Specializations of format microarchitecture}
+%\label{tab:format_microarchitecture_specializations}
+%\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/FMT_all.png}
+    \caption{Format microarchitecture implementation topology. Every rank, in every fibertree, in every kept dataspace which is subject to a format SAF for a given buffer, has a corresponding metadata parser in the format microarchitecture topology. This implementation topology is universal for format microarchitectures regardless of the specific \textit{fmt\_list} parameter value. Each metadata parser subcomponent, however, has two free parameters. Setting \textit{coordinate\_arithmetic = no} for the $j$th metadata parser, means that that format microarchitecture will not support coordinate arithmetic for the corresponding fibertree rank. This can conserve resources i.e. if the rank is being contracted anyway.}
+    \label{fig:FMT_all}
+\end{figure}
+
 \subsection{Skipping microarchitectures}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/SKIP.png}
+    \caption{Skipping microarchitecture compound component template.}
+    \label{fig:SKIP}
+\end{figure}
+
+\subsubsection{Skipping microarchitecture specializations}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{llll}
+\toprule
+ format\_leader   & format\_follower   & direction       & optimize\_fills   \\
+\midrule
+ C               & C                 & bidirectional   & no\_opt\_fills     \\
+ B               & B                 & bidirectional   & no\_opt\_fills     \\
+ C               & U                 & leader\_follower & no\_opt\_fills     \\
+ C               & U                 & leader\_follower & yes\_opt\_fills    \\
+\bottomrule
+\end{tabular}
+\caption{Specializations of skipping microarchitecture}
+\label{tab:Skipping microarchitecture_specializations}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/SKIP_C_C_bidirectional_no_opt_fills.png}
+    \caption{Bidirectional coordinate-payload (C) skipping microarchitecture implementation topology (``ExTensor-like''\cite{extensor}.)}
+    \label{fig:SKIP_C_C_bidirectional_no_opt_fills}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/SKIP_B_B_bidirectional_no_opt_fills.png}
+    \caption{Bidirectional bitmask (B) skipping microarchitecture implementation topology (``SparTen-like''\cite{sparten}.)}
+    \label{fig:SKIP_B_B_bidirectional_no_opt_fills}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/SKIP_C_U_leader_follower_no_opt_fills.png}
+    \caption{Leader-follower coordinate-payload (C) to uncompressed offset-pair (U) skipping microarchitecture implementation topology, without fill optimization.}
+    \label{fig:SKIP_C_U_leader_follower_no_opt_fills}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/SKIP_C_U_leader_follower_yes_opt_fills.png}
+    \caption{Leader-follower coordinate-payload (C) to uncompressed offset-pair (U) skipping microarchitecture implementation topology, with fill optimization (``Eyeriss-v2-like''\cite{eyerissv2}.)}
+    \label{fig:SKIP_C_U_leader_follower_yes_opt_fills}
+\end{figure}

@@ -1,0 +1,109 @@
+\chapter{Design and characterization of basic RTL blocks}
+
+\section{Scalar RTL blocks}
+
+This work provides characterized RTL blocks for:
+
+\begin{itemize}
+    \item Arithmetic
+
+    \begin{itemize}
+        \item Adder
+        \item Subtractor
+        \item Multiplier
+    \end{itemize}
+    
+    \item Comparison
+
+    \begin{itemize}
+        \item Equality comparator
+    \end{itemize}
+\end{itemize}
+
+These straightforward circuits are useful as building blocks for other RTL designs, and the characterization metrics for these circuits are useful building-blocks for modeling.
+
+These components are parameterized by operand bitwidth. All of these components are scalar, processing one set of operands per cycle and producing one output.
+
+\section{Vectorized RTL blocks}
+
+All ``vectorized' RTL blocks consume vector inputs and yield vector outputs. Depending on implementation, the degree of input and output vectorization may be determined by separate parameters (as is the case for the ``skip-ahead'' intersection unit) or by a single parameter (as is the case for the two-fingered merge-based intersection unit.)
+
+Here, ``vectorization'' is used to mean that (1) the input and output data structures of the RTL block are vectors, and (2) the processing throughput is such that all vector operands are consumed within a cycle, and each vector output is produced in its entirety within a cycle.
+
+Notably, an RTL block being ``vectorized'' is decoupled from the degree of parallelism of the underlying combinational logic. The vectorized ripple prefix-sum, for example, uses a linear-depth design based on chained adders in order to process a vector of inputs within a cycle (provided that the critical path latency complies with the clock latency), while the vectorized parallel Kogge-Stone prefix-sum uses a log-depth tree design that trades off higher area for sub-linear critical path length scaling.
+
+\subsection{Prefix-sum units}
+
+\textbf{Vectorized prefix sum parameters:}
+
+\begin{itemize}
+    \item Input vector length
+    \item Word bits
+\end{itemize}
+
+\textbf{RTL implementations for the following prefix sum designs (all sharing the above parameter list) are provided:}
+
+\begin{itemize}
+    \item \textbf{Ripple prefix-sum:} linear-depth prefix-sum implementation based on chained adders.
+    \item \textbf{Parallel Kogge-Stone prefix-sum:} log-depth prefix-sum implementation based on adder trees.
+\end{itemize}
+
+\subsection{Priority encoder units}
+
+\textbf{Vector priority encoder parameters:}
+
+\begin{itemize}
+    \item Number of input bits
+    \item Output vector size
+    
+    \begin{itemize}
+        \item Meaning: if the output vector size is $k$, a vectorized priority encoder returns a vector of indices for the top-$k$ priority hot bits in the input vector. 
+        \item If the input bitmask contains $n < k$ hot bits, the priority encoder returns a length-$k$ vector with the $n$ hot-bit indices compacted into the first $n$ vector elements; vector elements a offsets $>n-1$ are undefined.
+    \end{itemize}
+
+\end{itemize}
+
+\textbf{RTL implementations for the following priority encoder designs (all sharing the above parameter list) are provided:}
+
+\begin{itemize}
+    \item \textbf{Parallel decimation-by-2 priority encoder:} log-depth, decimation-by-2 parallel tree-based priority encoder design.
+\end{itemize}
+
+\subsection{Intersection units}
+
+\subsubsection{Two-fingered merge-based intersection unit}
+
+\subsubsection{``Skip-ahead'' intersection unit}
+
+\subsubsection{Parallel direct-mapped intersection unit}
+
+This design intersects two vectors of sorted coordinate metadata, and outputs a third sorted vector of common metadata values between the two input vectors. See Figure~\ref{fig:direct_mapped_isect}.
+
+The implementation is based on a ``direct-mapped approach'', analogous to direct-mapped cache. An array of decoders maps the input vector operands from position-space into coordinate-space; this mapping is performed in parallel. This yields two bitmasks (one per operand); in a given operand's bitmask, the index of each hot bit corresponds to an explicit coordinate value in the corresponding input vector. A bitmask intersection is then performed, yielding a new bit-vector in which each hot bit corresponds to a \textit{common} explicit coordinate value between the two vectors. Compaction logic maps these common coordinates back into position-space, yielding a sorted vector of explicit coordinate values which are common to both input vectors.
+
+\textbf{Vectorized parallel direct-mapped intersection unit parameters:}
+
+\begin{itemize}
+    \item Vector size (applies to input and output.)
+    \item Fiber size (the coordinate-space length of the two sparse fibers being intersected.)
+    \item Coordinate metadata bitwidth.
+\end{itemize}
+
+For example, a fiber spanning the range of coordinate values $[0,L-1]$ would require the fiber size parameter to be set to L, regardless of the number of non-zero values in the fiber.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/direct_mapped_isect.png}
+    \caption{Vectorized direct-mapped intersection unit. Consumes two coordinate metadata vectors, and outputs a compacted and sorted vector of common elements, along with a count of common elements ($num\_matches$.) Output vector indices greater than $num\_matches - 1$ have undefined values.}
+    \label{fig:direct_mapped_isect}
+\end{figure}
+
+\subsubsection{Parallel bitmask intersection unit}
+
+\textbf{Vectorized parallel bitmask intersection unit parameters:}
+
+\begin{itemize}
+    \item Number of input bits
+\end{itemize}
+
+The parallel bitmask intersection unit applies a straightforward bitwise-AND operation and outputs the result.
