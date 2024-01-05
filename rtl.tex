@@ -30,7 +30,7 @@ All ``vectorized' RTL blocks consume vector inputs and yield vector outputs. Dep
 
 Here, ``vectorization'' is used to mean that (1) the input and output data structures of the RTL block are vectors, and (2) the processing throughput is such that all vector operands are consumed within a cycle, and each vector output is produced in its entirety within a cycle.
 
-Notably, an RTL block being ``vectorized'' is decoupled from the degree of parallelism of the underlying combinational logic. The vectorized ripple prefix-sum, for example, uses a linear-depth design based on chained adders in order to process a vector of inputs within a cycle (provided that the critical path latency complies with the clock latency), while the vectorized parallel Kogge-Stone prefix-sum uses a log-depth tree design that trades off higher area for sub-linear critical path length scaling.
+Notably, an RTL block being ``vectorized'' is decoupled from the degree of parallelism of the underlying combinational logic. The vectorized ripple prefix-sum, for example, uses a linear-depth design based on chained adders in order to process a vector of inputs within a cycle (provided that the critical path latency complies with the clock latency), while the vectorized parallel Kogge-Stone\cite{koggestone} prefix-sum uses a log-depth tree design that trades off higher area for sub-linear critical path length scaling.
 
 \subsection{Prefix-sum units}
 
@@ -45,7 +45,7 @@ Notably, an RTL block being ``vectorized'' is decoupled from the degree of paral
 
 \begin{itemize}
     \item \textbf{Ripple prefix-sum:} linear-depth prefix-sum implementation based on chained adders.
-    \item \textbf{Parallel Kogge-Stone prefix-sum:} log-depth prefix-sum implementation based on adder trees.
+    \item \textbf{Parallel Kogge-Stone\cite{koggestone} prefix-sum:} log-depth prefix-sum implementation based on adder trees.
 \end{itemize}
 
 \subsection{Priority encoder units}
@@ -66,7 +66,7 @@ Notably, an RTL block being ``vectorized'' is decoupled from the degree of paral
 \textbf{RTL implementations for the following priority encoder designs (all sharing the above parameter list) are provided:}
 
 \begin{itemize}
-    \item \textbf{Parallel decimation-by-2 priority encoder:} log-depth, decimation-by-2 parallel tree-based priority encoder design.
+    \item \textbf{Parallel decimation-by-2 priority encoder\cite{recursive_priority_encoder}:} log-depth, decimation-by-2 parallel priority encoder design.
 \end{itemize}
 
 \subsection{Intersection units}

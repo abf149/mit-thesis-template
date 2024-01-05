@@ -1,15 +1,63 @@
-\chapter{Tables}
+\chapter{Explanation of PE area breakdowns from existing sparse tensor accelerator designs}
+
+This section justifies the breakdowns of PE area for published sparse tensor accelerator designs, shown in Figure~\ref{fig:saf_uarch_significance}.
+
+\section{GAMMA\cite{gamma}}
+
+\section{SparTen\cite{sparten}}
+
+\section{Eyeriss v2\cite{eyerissv2}}
+
+This section justifies the claim in Figure~\ref{fig:saf_uarch_significance} that SAF microarchitecture comprises 7\% of Eyeriss v2 PE area. This claim is not made explicitly in the Eyeriss v2 paper\cite{eyerissv2}; rather, 7\% is an estimate I developed based on metrics that were provided in the paper.
+
+The Eyeriss v2 PE loads activations from the weight scratchpad (weight spad), conditional on the compressed-sparse-column (CSC) metadata of input activation (iact) data being read from the iact spad\cite{eyerissv2}. This pattern of memory accesses can be understood as an $iact \rightarrow weight$ leader/follower skipping SAF. The use of CSC format for weights and iacts can be understood as a $T-<UC>(WH)$ format SAF. \textbf{Note that the use of SAF terminology and sparse tensor notation here is my own interpretation of Eyeriss v2, based on the definitions developed in \cite{sparseloop}\cite{szebook}.}
+
+The leader/follower skipping SAF is lightweight: abstractly, the leader/follower intersection is simply a wire from iact data spad read output to iact address spad read input. Thus for a very rough estimate, the leader/follower intersection area overhead could be quantified as approximately zero. However, in practice there is control logic associated with this abstract wire which adds additional area to the skipping microarchitecture. 
+
+Furthermore, the Eyeriss v2 PE maintains separate address and data memories for each datatype, and data memory is accessed indirectly by first doing a lookup into address memory\cite{eyerissv2}. 
+
+Figure 17 of the Eyeriss v2 paper shows that the PE implements a pipeline for all of these layers of indirect memory access\cite{eyerissv2}. Thus, it is arguable that part of the purpose of the Eyeriss v2 PE pipeline is to implement the leader/follower skipping SAF and the CSC format SAF. For this reason, Figure~\ref{fig:saf_uarch_significance} counts a portion of the PE control logic when estimating the proportion of SAF microarchitecture area in the Eyeriss v2 PE (the iact and weight address buffers are arguably \textit{architectural} overheads required in the implementation of the CSC format SAF, and thus do not count towards SAF \textit{microarchitecture.})
+
+
 
 \begin{table}
-\caption{Armadillos}
+\caption{Eyeriss v2 PE area breakdown (Fig. 18b from \cite{eyerissv2})}
+\label{tab:eyerissv2_pe_breakdown}
 \label{arm:table}
 \begin{center}
-\begin{tabular}{||l|l||}\hline
-Armadillos & are \\\hline
-our	   & friends \\\hline
+\begin{tabular}{||l|l|l||}\hline
+\textbf{PE subcomponent(s)} & \textbf{Area} \%  & \textbf{Categorization based on this work}  \\\hline
+spad	   & 74.4\% & Architectural memory \\\hline
+- \textit{weight data}	   & \textit{21.5\%} &\\\hline
+- \textit{weight addr}	   & \textit{5.7\%} & Architectural Format SAF overhead\\\hline
+- \textit{iact data}	   & \textit{11.5\%} &\\\hline
+- \textit{iact addr}	   & \textit{2.1\%} & Architectural Format SAF overhead \\\hline
+- \textit{psum data}   & \textit{33.6\%} &\\\hline
+compute (MAC)	   & 5.2\% & Architectural compute \\\hline
+I/O FIFOs	   & 9.4\% & Non-SAF-related $\mu$arch\\\hline
+control logic	   & 11.1\% & \textbf{Includes SAF $\mu$arch} \\\hline
+\textbf{Total}	   & 100.1\% & \\\hline
 \end{tabular}
 \end{center}
 \end{table}
 
+Fig. 18b of the Eyeriss v2 paper\cite{eyerissv2} provides a breakdown of PE area, which is reproduced here in Table~\ref{tab:eyerissv2_pe_breakdown} (\textbf{Note that the categories assigned in the third column are my own interpretation and do not come from the Eyeriss v2 paper}.)
+
+Figure~\ref{fig:saf_uarch_significance} does not count the full 11.1\% of control logic area (shown in Table~\ref{tab:eyerissv2_pe_breakdown}) as SAF microarchitecture. The estimate that SAF microarchitecture accounts for 7\% of PE area is based on examining the PE pipeline and developing a heuristic for the proportion of control logic which is attributable to SAF microarchitecture. The PE pipeline in Fig. 18b of the Eyeriss v2 paper\cite{eyerissv2} shows a five-stage pipeline (ignoring the single architectural register which holds an iact value stationary), and three of these pipeline stages arguably serve to implement SAFs: 
+
+\begin{itemize}
+    \item There is a set of pipeline registers between the weight address and weight data spads, and another set of registers between the iact address and iact data spads; since these registers pipeline the process of performing indirect lookups into data memory via lookups into address memory, \textit{here I categorize these two sets of registers as comprising parts of the format microarchitectures for the iact and weight spads.}
+    
+    \item There is a stage of pipeline registers after the iact spads and before the weight spads; this stage effectively pipelines the process of looking up weights based on iact metadata (i.e. leader/follower skipping), and \textit{therefore I categorize this pipeline stage as being part of the leader/follower skipping microarchitecture.}
+\end{itemize}
+
+Fig. 17 from the Eyeriss v2 paper visually suggests that all five pipeline stages are similar in size. Thus, about $\frac{3}{5}$ or 60\% of Eyeriss v2 pipeline area could potentially be categorized as SAF microarchitecture. Extrapolating this 60\% estimate from the pipeline area to the overall control logic area leads to the following estimate for the proportion of SAF microarchitecture area in the PE:
+
+\[(11.1\%\;ctrl\,logic\,area)\times(60\%\;SAF\,\mu arch\,logic)\]
+
+\[ = 6.9\%\; SAF\,\mu arch\,area\]
+
+
+which is the source of the 7\% claim in Figure~\ref{fig:saf_uarch_significance}. 
 \clearpage
 \newpage

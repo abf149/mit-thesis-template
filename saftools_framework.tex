@@ -1,2 +1,51 @@
 \chapter{SAFtools framework}
 
+\section{RTL block library}
+
+\subsection{45nm gate-level characterization}
+
+Here, RTL ``characterization'' refers to simulation-modeling of the energy, area and timing-characteristics of small RTL designs, done for the purpose of creating analytical models (as opposed to for the purpose of designing a chip.)
+
+The RTL blocks developed in this work were characteristized using Synopsys Design Compiler (SDC) to synthesize a gate-level netlist targeting the OpenPDK45 45nm PDK. The analytical models of RTL-block energy/area/latency reflect the SDC estimates of energy, area and timing characteristics (specifically propagation delay) based on the gate-level netlist.
+
+The author notes that gate-level modeling of energy, area and especially timing may incur a relative accuracy penalty, since as observed by the authors of Wattch\cite{wattch}, ``Most existing power analysis tools achieve high accuracy by calculating power estimates for designs only after layout or floorplanning are complete...such tools are often quite slow, which compounds the difficulty of running them for a large space of design possibilities.'' Being that the RTL library comprises a only a portion of this work, the much faster gate-level modeling process was favored to facilitate short turnaround time during the RTL development process. Even using gate-level synthesis and modeling, it was still time-consuming to characterize highly parallel RTL blocks with deep vector pipelines. 
+
+Improving modeling accuracy by performing modeling after the floorplanning or layout phases could be a valuable task for future research.
+
+\subsection{RTL development in Chisel}
+
+Early on, it was decided to develop the RTL blocks in a higher-level language than Verilog. While Verilog supports parameterization, higher-level languages provide more powerful and concise abstractions for designing parameterized RTL. 
+
+Since SDC takes Verilog-language RTL as input, any workflow for defining the RTL blocks had to ultimately produce Verilog.
+
+The following high-level HDLs and workflows were considered as candidates for implementing the RTL library in this work:
+
+\begin{itemize}
+    \item SystemC\cite{systemc}\footnote{SystemC language homepage: \url{https://systemc.org/}}, a C++ framework for transaction-level modeling (TLM)\cite{systemc}, which decouples implementation from communication. Intel\textregistered Compiler for SystemC \footnote{\url{https://github.com/intel/systemc-compiler}} can synthesize SystemVerilog from SystemC. SystemC was ultimately discarded as an option due to the difficulty in automatically converting the SystemVerilog to Verilog that was acceptable by SDC.
+    \item Bluespec SystemVerilog\cite{bluespec}\footnote{Bluespec language homepage: \url{https://github.com/B-Lang-org/bsc}}, a very high-level HDL with an open-source compiler, support for software-like syntax for parameterized component design, and a workflow that exports to Verilog.
+    \item Chisel\cite{chisel}\footnote{Chisel language homepage: \url{https://www.chisel-lang.org/}}, a hardware description language (HDL) implemented as a Scala framework, which was developed by the Berkeley Architecture Research (BAR) Group\footnote{U.C. Berkeley Architecture Research Group: \url{https://bar.eecs.berkeley.edu/}}. Similar to Bluespec, is a very high-level language with an open-source compiler, support for software-like syntax for parameterized component design, and a workflow that exports to Verilog.
+\end{itemize}
+
+Between Bluespec and Chisel, ultimately Chisel was selected as it was the most intuitive and is very widely-used within the computer-architecture community.
+
+\section{SAFmodel: primitive component scale inference}
+
+\subsection{Building the scale inference problem}
+
+\subsection{Scale-inference MINLP solver}
+
+\section{SAFinfer: SAF microarchitecture topology inference}
+
+\subsection{}
+
+\section{Parsing and Accelergy model synthesis}
+
+\subsection{Parsing frontends}
+
+\subsubsection{\textit{Taxoscript} and \textit{Modelscript} parsers}
+
+\subsection{Accelergy model synthesis backend}
+
+\subsubsection{The SAFmodel Accelergy estimator}
+
+\section{SAFsearch}
