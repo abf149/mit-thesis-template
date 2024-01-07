@@ -48,6 +48,24 @@ Notably, an RTL block being ``vectorized'' is decoupled from the degree of paral
     \item \textbf{Parallel Kogge-Stone\cite{koggestone} prefix-sum:} log-depth prefix-sum implementation based on adder trees.
 \end{itemize}
 
+\subsubsection{Kogge-Stone prefix-sum}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/kogge_stone_prefix_sum.png}
+    \caption{The Kogge-Stone\cite{koggestone} prefix-sum RTL block implements a log-depth vectorized prefix-sum with a 1-stage vector pipeline (registered I/O.) It is parameterized by \textbf{input word bitwidth} and \textbf{degree of vectorization.}}
+    \label{fig:hierarchical_general_format_sparse_smartbuffer}
+\end{figure}
+
+\subsubsection{Ripple prefix-sum}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/ripple_prefix_sum.png}
+    \caption{The ripple prefix-sum RTL block implements a linear-depth vectorized prefix-sum. It is parameterized by \textbf{input word bitwidth} and \textbf{degree of vectorization.} This RTL block is implemented as a 1-stage vector pipeline (registered I/O) however the combinational design is not ``parallel'' and propagation delay is linear in the degree of vectorization.}
+    \label{fig:ripple_prefix_sum}
+\end{figure}
 \subsection{Priority encoder units}
 
 \textbf{Vector priority encoder parameters:}
@@ -72,6 +90,23 @@ Notably, an RTL block being ``vectorized'' is decoupled from the degree of paral
 \subsection{Intersection units}
 
 \subsubsection{Two-fingered merge-based intersection unit}
+
+% Radix-2 intersection overview figure
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\linewidth]{figures/radix2_intersect_overview.png}
+    \caption{Overview of Radix2 Intersection}
+    \label{fig:radix2-overview}
+\end{figure}
+
+% Radix-2 intersection example figure
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{figures/radix2_intersect_example.png}
+    \caption{Example of Radix2 Intersection}
+    \label{fig:radix2-example}
+\end{figure}
+
 
 \subsubsection{``Skip-ahead'' intersection unit}
 
