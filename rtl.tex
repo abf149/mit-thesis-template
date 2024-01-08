@@ -1,4 +1,5 @@
 \chapter{Design and characterization of basic RTL blocks}
+\label{chapter:rtl}
 
 \section{Scalar RTL blocks}
 
@@ -89,10 +90,10 @@ Notably, an RTL block being ``vectorized'' is decoupled from the degree of paral
 
 \subsection{Intersection units}
 
-\subsubsection{Two-fingered merge-based intersection unit}
+\subsubsection{Radix-2 merge-based intersection unit (``ExTensor-naive-like'')}
 
 % Radix-2 intersection overview figure
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{figures/radix2_intersect_overview.png}
     \caption{Overview of Radix2 Intersection}
@@ -107,8 +108,15 @@ Notably, an RTL block being ``vectorized'' is decoupled from the degree of paral
     \label{fig:radix2-example}
 \end{figure}
 
+% Radix-2 intersection overview figure
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{figures/two_finger_merge_pipeline.png}
+    \caption{Radix-2 intersection vector pipeline}
+    \label{fig:radix_2_vector pipeline}
+\end{figure}
 
-\subsubsection{``Skip-ahead'' intersection unit}
+\subsubsection{``Skip-ahead'' intersection unit (``ExTensor-optimized-like'')}
 
 \subsubsection{Parallel direct-mapped intersection unit}
 
@@ -142,3 +150,11 @@ For example, a fiber spanning the range of coordinate values $[0,L-1]$ would req
 \end{itemize}
 
 The parallel bitmask intersection unit applies a straightforward bitwise-AND operation and outputs the result.
+
+% Bitmask intersection
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{figures/bitmask_intersection.png}
+    \caption{Bitmask intersection vector pipeline.}
+    \label{fig:bitmask_intersection}
+\end{figure}

@@ -1,10 +1,19 @@
-\chapter{Challenges of design-space exploration and tradeoff comparison}
+\chapter{Modeling techniques for SAF microarchitectures}
+\label{chapter:modeling}
 
-\section{Taxonomic design-space exploration of SAF microarchitectures}
+Before we can perform SAF microarchitecture design-space exploration, we first require SAF microarchitecture models. Otherwise comparison between SAF microarchitecture designs is impossible.
+
+This section will introduce (1) the structure of energy/area models developed in this work, (2) a method for modeling SAF microarchitecture workloads in sparse tensor accelerators, and (3) a process for scaling up the SAF microarchitecture to match the magnitude of the workload imposed upon it.
+
+\begin{figure}[h]
+\includegraphics[width=\textwidth]{figures/accelergy_comparison.png}
+\caption{The Accelergy modeling framework compared to the modeling framework in this work.}
+\label{fig:accelergy_comparison}
+\end{figure}
 
 \section{Utilizing SAF microarchitecture modeling for tradeoff decisions}
 
-Taxonomic design-space exploration alone does not facilitate tradeoff decisions. A separate modeling process is required in order to compute a cost objective for comparing two or more possible microarchitecture topologies.
+
 
 One challenge is that taxonomic design-space exploration yields high-level topologies but does not address low-level optimization of the microarchitecture. Ideally each SAF primitive's action-energy and area models reflect good design choices which minimize energy and area as nearly as possible; the problem is that the workload (or just ``load'') of sparse format processing work is highly dependent on where a SAF microarchitecture resides within an architecture; load-handling requirements lower-bound the cost of designing sufficiently performant SAF microarchitectures.
 
@@ -46,7 +55,7 @@ However, it quickly becomes apparent that load and load-handling ability are mul
         \caption{The local throughput at each rank grows with increasing arithmetic throughput, and shrinks in proportion to the stride of the loop(s) which the fiber is bound to.}
         \label{fig:local_throughput_diagram}
     \end{figure}
-    
+
     As an optimization, the designer implements a bidirectional skipping SAF between buffers $A$ and $B$. The skipping microarchitecture intersects $A$ and $B$ metadata and outputs a pair of $A$ and $B$ data read addresses for each intersection match. Consider what load-handling requirements the skipping microarchitecture must be designed for, in order to avoid MAC under-utilization: the skipping microarchitecture must serve $4$ $A$ addresses and $4$ $B$ addresses per cycle in order to facilitate reading 4 data values per cycle from each operand. Notably, this is a requirement on the skipping microarchitecture which results directly from the arithmetic throughput-handling design-point.
 
     Note that in the above example, the skipping microarchitecture, buffers, and MAC are all synchronized with the innermost loop of the mapping loop-nest; this is the fastest loop. Conversely, the outermost loops of the mapping loop-nest have greater latency between loop iterations (i.e. more cycles-per-iteration). Microarchitectures synced to slower loops can maximally exploit latency-hiding to relax throughput-handling requirements by spreading out sequential processing over the time between loop iterations. Microarchitectures synced to faster loops must be capable of handling higher processing throughput without exploiting latency hiding. This state of affairs is summarized in Figure~\ref{fig:local_throughput_diagram}
@@ -82,6 +91,27 @@ To characterize loading, here the concept of a \textit{loadspace} is introduced.
     \caption{This work proposes modeling workloads as ``loadspaces''. Here, \textit{word bitwidth},  \textit{local architectural throughput}, \textit{coordinate throughput}, and \textit{dense rank size} are proposed as key loadspace dimensions when designing SAF microarchitectures.}
     \label{fig:workload_representation}
 \end{figure}
+
+    \begin{table}[h]
+        \centering
+        \caption{Mnemonics for workload dimensions.}
+        \label{table:workload_dimension_mnemonics}
+        \begin{tabular}{||c|c|c||}
+            \hline \hline
+            Workload Dimension & Mnemonic & Stands for \\
+            \hline \hline
+            Dense rank size & nc & num. coordinates \\
+            \hline
+            Local throughput & pr & position rate \\
+            \hline
+            Coordinate throughput & cr & coordinate rate \\
+            \hline
+            Bitwidth & ww & word width \\
+            \hline
+            Bandwidth & rw & read width \\
+            \hline \hline
+        \end{tabular}
+    \end{table}
 
 \subsection{Scalespaces}
 
