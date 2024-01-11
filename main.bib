@@ -350,3 +350,75 @@ keywords = {staging buffers, data orchestration, accelerators, synchronization},
 location = {Providence, RI, USA},
 series = {ASPLOS '19}
 }
+
+@INPROCEEDINGS{cambricon_x,
+  author={Zhang, Shijin and Du, Zidong and Zhang, Lei and Lan, Huiying and Liu, Shaoli and Li, Ling and Guo, Qi and Chen, Tianshi and Chen, Yunji},
+  booktitle={2016 49th Annual IEEE/ACM International Symposium on Microarchitecture (MICRO)}, 
+  title={Cambricon-X: An accelerator for sparse neural networks}, 
+  year={2016},
+  volume={},
+  number={},
+  pages={1-12},
+  doi={10.1109/MICRO.2016.7783723}}
+
+@INPROCEEDINGS{cnvlutin,
+  author={Albericio, Jorge and Judd, Patrick and Hetherington, Tayler and Aamodt, Tor and Jerger, Natalie Enright and Moshovos, Andreas},
+  booktitle={2016 ACM/IEEE 43rd Annual International Symposium on Computer Architecture (ISCA)}, 
+  title={Cnvlutin: Ineffectual-Neuron-Free Deep Neural Network Computing}, 
+  year={2016},
+  volume={},
+  number={},
+  pages={1-13},
+  doi={10.1109/ISCA.2016.11}}
+
+@misc{sparse_arch_lecture1,
+  title={Hardware Architectures for Deep Learning: Sparse Architectures – Part 1},
+  author={Emer, Joel and Sze, Vivienne},
+  year={2023},
+  month={April},
+  day={5},
+  howpublished={Massachusetts Institute of Technology, Electrical Engineering \& Computer Science},
+  url={http://csg.csail.mit.edu/6.5930/Lectures/L15.pdf}
+}
+
+@article{taco_format,
+  author       = {Stephen Chou and
+                  Fredrik Kjolstad and
+                  Saman P. Amarasinghe},
+  title        = {Unified Sparse Formats for Tensor Algebra Compilers},
+  journal      = {CoRR},
+  volume       = {abs/1804.10112},
+  year         = {2018},
+  url          = {http://arxiv.org/abs/1804.10112},
+  eprinttype    = {arXiv},
+  eprint       = {1804.10112},
+  timestamp    = {Mon, 13 Aug 2018 16:47:32 +0200},
+  biburl       = {https://dblp.org/rec/journals/corr/abs-1804-10112.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+@misc{teaal,
+      title={TeAAL: A Declarative Framework for Modeling Sparse Tensor Accelerators}, 
+      author={Nandeeka Nayak and Toluwanimi O. Odemuyiwa and Shubham Ugare and Christopher W. Fletcher and Michael Pellauer and Joel S. Emer},
+      year={2023},
+      eprint={2304.07931},
+      archivePrefix={arXiv},
+      primaryClass={cs.AR}
+}
+
+@inproceedings{csf,
+author = {Smith, Shaden and Karypis, George},
+title = {Tensor-Matrix Products with a Compressed Sparse Tensor},
+year = {2015},
+isbn = {9781450340014},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/2833179.2833183},
+doi = {10.1145/2833179.2833183},
+abstract = {The Canonical Polyadic Decomposition (CPD) of tensors is a powerful tool for analyzing multi-way data and is used extensively to analyze very large and extremely sparse datasets. The bottleneck of computing the CPD is multiplying a sparse tensor by several dense matrices. Algorithms for tensor-matrix products fall into two classes. The first class saves floating point operations by storing a compressed tensor for each dimension of the data. These methods are fast but suffer high memory costs. The second class uses a single uncompressed tensor at the cost of additional floating point operations. In this work, we bridge the gap between the two approaches and introduce the compressed sparse fiber (CSF) a data structure for sparse tensors along with a novel parallel algorithm for tensor-matrix multiplication. CSF offers similar operation reductions as existing compressed methods while using only a single tensor structure. We validate our contributions with experiments comparing against state-of-the-art methods on a diverse set of datasets. Our work uses 58\% less memory than the state-of-the-art while achieving 81\% of the parallel performance on 16 threads.},
+booktitle = {Proceedings of the 5th Workshop on Irregular Applications: Architectures and Algorithms},
+articleno = {5},
+numpages = {7},
+location = {Austin, Texas},
+series = {IA3 '15}
+}
