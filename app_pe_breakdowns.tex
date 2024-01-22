@@ -1,15 +1,84 @@
 \chapter{Explanation of PE area breakdowns from existing sparse tensor accelerator designs}
 \label{appendix:pe_breakdowns}
 
-This section justifies the breakdowns of PE area for published sparse tensor accelerator designs, shown in Figure~\ref{fig:saf_uarch_significance}.
+This section justifies the breakdowns of PE area for published sparse tensor accelerator designs, shown in Figure~\ref{fig:saf_uarch_significance}. To keep the analysis as simple as possible, only the PE area is considered.
 
 \section{GAMMA\cite{gamma}}
+\label{appendix:pe_breakdowns_gamma}
+
+The GAMMA\cite{gamma} paper quotes the following breakdown of PE area:
+
+\begin{table}
+\caption{GAMMA PE area breakdown (Tab. 2 from \cite{gamma})}
+\label{tab:gamma_pe_breakdown}
+\begin{center}
+\begin{tabular}{||l|l|l||}\hline
+\textbf{PE subcomponent(s)} & \textbf{PE Area} \%  & \textbf{Categorization based on this work}  \\\hline
+Merger	   & 30\% & \textbf{SAF microarchitecture} \\\hline
+FP Mul	   & 5.2\% & Architectural compute \\\hline
+FP Add	   & 9.4\% & Architectural compute \\\hline
+Others	   & 11.1\% & Architectural or non-SAF $\mu$arch \\\hline
+\textbf{Total}	   & 100\% & \\\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+Note the lack of an explicit category for PE local memory in the breakdown of Table~\ref{tab:gamma_pe_breakdown}. The breakdown in Table~\ref{tab:gamma_pe_breakdown} can thus be further summarized as
+
+\begin{itemize}
+    \item \textbf{SAF microarchitecture:} 30\%, includes merger
+    \item \textbf{Compute:} 14.6\%, includes FP Mul and FP Add
+    \item \textbf{On-chip memory:} 0\%
+    \item \textbf{Other:} 11.1\%
+\end{itemize}
+
+which is the breakdown shown in Figure~\ref{fig:saf_uarch_significance}.
+
+\subsection{Relating the Gustavson/row-wise product dataflow to SAF microarchitecture}
+
+The GAMMA PE employs a row-wise product dataflow for loading CSR-format GEMM ($C_{M\times N} = A_{M\times K} \times B_{K\times N}$) operands from memory. A single element $a_{i,j}$ of $A_{M\times K}$ and a row $b_{j,:}$ of $B_{K\times N}$ are loaded from on-chip memory into the PE; this reflects that the $N$ rank of B is traversed in the inner-most loop, while the contracted $K$ rank is traversed at an intermediate loop level. Row-wise product enables a cheap leader-follower skipping microarchitecture because $a_{i,j}$ is guaranteed to be multiplied by all elements of $b_{j,:}$, without needing to do any coordinate-matching (furthermore, the FiberCache\cite{gamma} may be used to support $b_{j:}$ reuse across rows of A.) 
+
+Upon receiving $a_{i,j}$ and $b_{j,:}$ values from memory, the GAMMA PE implements a rank-swap which moves the contracted dimension $K$ into the innermost loop. This enables inner-product accumulation into a single PE output register. The output memory footprint saved by the rank-swap is significant: a design such as MatRaptor\cite{matraptor} which implements row-wise product \textit{without} a rank-swap must store and incrementally accumulate $|K|$ rows of partial outputs, each of size $1 \times |N|$, requiring increased output memory footprint. Given the benefit of rank-swap, is there a tradeoff involved in using it? The use of CSR in GAMMA, means thank rank-swap requires a merge primitive (analogous to the merge operation in mergesort) in order to do a stable sort of multiple $b_{j,:}$ rows based on their rank-$K$ coordinate metadata, effectively implementing a transpose. GAMMA employs a radix-64 merge unit\cite{gamma} in order to do this. 
+
+Although the rank-swap itself is not a sparse optimization, nonetheless the need for this type of merge unit results from employing a rank-swapped dataflow \textit{in the context of employing CSR format for the $B_{K\times N}$ operand}. Thus it is justifiable to say that the merge unit is part of the format microarchitecture which implements the CSR format SAF. It is this format microarchitecture which accounts for 30\% of PE area in GAMMA.
 
 \section{SparTen\cite{sparten}}
 
+The SparTen paper provides the following breakdown of design area:
+
+\begin{table}
+\caption{SparTen PE area breakdown (Tab. 4 from \cite{sparten})}
+\label{tab:sparten_pe_breakdown}
+\begin{center}
+\begin{tabular}{||l|l|l||}\hline
+\textbf{PE subcomponent(s)} & \textbf{PE Area ($mm^2$)}  & \textbf{Categorization based on this work}  \\\hline
+Buffers	   & 0.1 & Architectural memory \\\hline
+Prefix-sum	   & 0.418 & \textbf{SAF microarchitecture} \\\hline
+Priority Encoder	   & 0.0626 & \textbf{SAF microarchitecture} \\\hline
+MACs	   & 0.0432 & Architectural compute \\\hline
+Permute network	   & 0.0344 & \textbf{SAF microarchitecture} \\\hline
+Other	   & 0.1 & Architectural or non-SAF microarchitecture \\\hline
+\textbf{Total}	   & 0.766 & \\\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+Prefix-sum and priority encoder are both key to converting intersected bitmask metadata into memory lookup addresses. The permute network is counted as SAF microarchitecture, on the basis that it is key to SparTen's data orchestration in the presence of sparsity; the permute network helps to address load imbalance.
+
+The breakdown in Table~\ref{tab:sparten_pe_breakdown} can be reduced to
+
+\begin{itemize}
+    \item \textbf{SAF microarchitecture:} 67\% (prefix-sum, priority encoder, permute network)
+    \item \textbf{On-chip memory:} 13\% 
+    \item \textbf{Compute:} 5.6\% (MACs)
+    \item \textbf{Other:} 13\%
+\end{itemize}
+
+which is the breakdown shown in Figure~\ref{fig:saf_uarch_significance}.
+
 \section{Eyeriss v2\cite{eyerissv2}}
 
-This section justifies the claim in Figure~\ref{fig:saf_uarch_significance} that SAF microarchitecture comprises 7\% of Eyeriss v2 PE area. This claim is not made explicitly in the Eyeriss v2 paper\cite{eyerissv2}; rather, 7\% is an estimate I developed based on metrics that were provided in the paper.
+This section justifies the claim in Figure~\ref{fig:saf_uarch_significance} that SAF microarchitecture comprises 7\% of Eyeriss v2 PE area. This claim is not made explicitly in the Eyeriss v2 paper\cite{eyerissv2}; rather, 7\% is an estimate developed in this work, based on metrics that were provided in the paper.
 
 The Eyeriss v2 PE loads activations from the weight scratchpad (weight spad), conditional on the compressed-sparse-column (CSC) metadata of input activation (iact) data being read from the iact spad\cite{eyerissv2}. This pattern of memory accesses can be understood as an $iact \rightarrow weight$ leader/follower skipping SAF. The use of CSC format for weights and iacts can be understood as a $T-<UC>(WH)$ format SAF. \textbf{Note that the use of SAF terminology and sparse tensor notation here is my own interpretation of Eyeriss v2, based on the definitions developed in \cite{sparseloop}\cite{szebook}.}
 
@@ -24,10 +93,9 @@ Figure 17 of the Eyeriss v2 paper shows that the PE implements a pipeline for al
 \begin{table}
 \caption{Eyeriss v2 PE area breakdown (Fig. 18b from \cite{eyerissv2})}
 \label{tab:eyerissv2_pe_breakdown}
-\label{arm:table}
 \begin{center}
 \begin{tabular}{||l|l|l||}\hline
-\textbf{PE subcomponent(s)} & \textbf{Area} \%  & \textbf{Categorization based on this work}  \\\hline
+\textbf{PE subcomponent(s)} & \textbf{PE Area} \%  & \textbf{Categorization based on this work}  \\\hline
 spad	   & 74.4\% & Architectural memory \\\hline
 - \textit{weight data}	   & \textit{21.5\%} &\\\hline
 - \textit{weight addr}	   & \textit{5.7\%} & Architectural Format SAF overhead\\\hline

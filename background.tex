@@ -1,19 +1,37 @@
 \chapter{Background and motivation}
 \label{chapter:background}
 
+\section{Taxonomy of accelerator dataflows}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{figures/C_D_orchestration.png}
+\caption{Data orchestration taxonomy from~\cite{buffet}. In \textit{Coupled} orchestration (\textit{left}) a module accesses data which it previously requested, while in \textit{decoupled} orchestration (\textit{right}) a separate \textit{address-generator} (AGEN) orchestrates data movement, anticipating a known deterministic pattern of future accesses by the module.}
+\label{fig:C_D_orchestration}
+\end{figure}
+
+A ``taxonomy of data orchestration approaches'' for domain-specific hardware accelerators was proposed in~\cite{buffet}, and is partially reproduced and simplified in Figure~\ref{fig:C_D_orchestration}. In creating this taxonomy, the authors' intention was to (1) categorize common approaches to sequencing data movement within memory hierarchies, in order to (2) motivate an ``efficient and composable'' storage idiom (Buffets\cite{buffet}) optimized for a particular, desirable form of data orchestration known as \textit{Explicit Decoupled Data Orchestration} or EDDO. 
+
+In the taxonomy of~\cite{buffet}, memories such as caches employ \textit{implicit} orchestration, because they hide complex and autonomous cache fill/eviction policies behind an interface that is indistinguishable from directly accessing memory, from the perspective of a downstream component. \textit{Explicit} orchestration refers to direct control of data movement within the memory hierarchy, based on direct commands that are conveyed via user programming or as part of requests issued by a downstream component. The explicit/implicit dichotomy will not be discussed further here, as it is less relevant to this work than the \textit{coupled/decoupled} dichotomy. This dichotomy refers to the way that memory access requests are handled. In a \textit{coupled} memory access paradigm, the component or module that is the ultimate consumer of some data stored in memory, is responsible for issuing requests to access that data. In contrast, a \textit{decoupled} memory access paradigm is possible in domain-specific accelerators which can anticipate a deterministic sequence of memory accesses. A component accesses memory assuming that the data it requires has already been filled and is resident at the appropriate level of the memory hierarchy. A separate (``decoupled'') component or module is responsible for overlapping each memory read with a request to fill new data into local memory; this requires that this sidecar component be pre-programmed with the deterministic sequence of memory accesses. Such a component is referred to as an \textit{address generator} (AGEN) in~\cite{buffet}. Figure~\ref{fig:C_D_orchestration} illustrates only the \textit{coupled}/\textit{decoupled} aspect of the taxonomy.
+
+The authors of~\cite{buffet} note a number of benefits of an EDDO dataflow, such as lowering pressure on the memory system. The data orchestration taxonomy of \cite{buffet} is included here for three reasons: first, EDDO data orchestration is a baseline assumption by Timeloop\cite{timeloop}/Sparseloop\cite{sparseloop}, tools which this work will use as a starting-point for developing SAF microarchitecture modeling, (2) Section~\ref{chapter:conceptual_framework} will propose an EDDO buffer abstraction as an aid in decoupling SAF microarchitecture from dataflow, and (3) Section~\ref{chapter:conceptual_framework} further proposes that the degree of coupled memory access is a key distinction between SAF microarchitecture and non-SAF microarchitecture.
+
 \section{Existing conceptual frameworks for sparse tensor accelerators}
 
-This work builds on prior efforts to build conceptual frameworks around sparse tensor accelerators, which will be reviewed in this section.
+This work builds on prior efforts to build conceptual frameworks around sparse tensor accelerators. All of the works in this section (except for Sparseloop\cite{sparseloop} itself) -  preceded Sparseloop, which introduced the term ``SAF''. Thus, any usage of the term ``SAF'' or ``SAF microarchitecture'' in this section is my own word choice and is not a quote.
 
-All of the works in this section (except for Sparseloop\cite{sparseloop} itself) -  preceded Sparseloop, which introduced the term ``SAF''. Thus, any usage of the term ``SAF'' or ``SAF microarchitecture'' in this section is my own word choice and is not a quote.
+\subsection{TACO\cite{taco}\cite{taco_format} hierarchical sparse tensor formats}
+\label{sec:taco_format}
 
-\subsection{TACO\cite{taco_format} hierarchical sparse tensor formats}
+Building on the TACO tensor algebra compiler\cite{taco}, a unified abstraction for representing diverse sparse tensor representation formats was developed in \cite{taco_format} with the goal of providing general sparsity support in TACO\cite{taco}. Figure~\ref{fig:taco_format_example} illustrates the two of the many \textit{level format} data structures from \cite{taco_format}.
 
 \begin{figure}[H]
 \includegraphics[width=0.5\textwidth]{figures/taco_levels.png}
-\caption{A subset of TACO\cite{taco_format} \textit{level formats.}}
+\caption{A subset\cite{taco_format} of TACO\cite{taco} sparse \textit{level formats.}}
 \label{fig:taco_levels}
 \end{figure}
+
+\cite{taco_format} proposes that many important sparse representation formats can be construed as tiered data structures in which each tier represents a tensor rank, represented using one of the handful of possible level formats. Figure~\ref{fig:taco_format_example} shows how compressed-sparse fiber (CSF)\cite{csf} and compressed-sparse row (CSR) can be represented within this unified sparse tensor abstraction.
 
 \begin{figure}[H]
     \centering
@@ -27,11 +45,14 @@ All of the works in this section (except for Sparseloop\cite{sparseloop} itself)
     \begin{subfigure}[b]{0.4\textwidth}
         \centering
         \includegraphics[width=\textwidth]{figures/taco_csf_csr.png}
-        \caption{(\textit{left}) CSF format, expressed with TACO levels and level abstraction. (\textit{right}) CSR format, again expressed with TACO levels and level abstraction. The matrix from Figure~\ref{fig:taco_matrix} is used as a reference.}
+        \caption{(\textit{left}) CSF\cite{csf} format, expressed with TACO\cite{taco} level formats and level abstraction\cite{taco_format} (\textit{right}) CSR format, again expressed with TACO levels and level abstraction. The matrix from Figure~\ref{fig:taco_matrix} is used as a reference.}
         \label{fig:taco_csf_csr}
     \end{subfigure}
-    \caption{Example of representing a matrix (2nd-order tensor) in both CSF and CSR formats, using level formats and level hierarchy from the TACO framework.}
+    \caption{Example of representing a matrix (2nd-order tensor) in both CSF\cite{csf} and CSR formats, using level formats\cite{taco_format} and level hierarchy from the TACO\cite{taco} framework.}
+    \label{fig:taco_format_example}
 \end{figure}
+
+To support compilation, level formats have a consistent programming model\cite{taco_format}. A level format supports certain \textit{capabilities} and certain \textit{properties}\cite{taco_format}, summarized in Table~\ref{tab:taco_capabilities_properties} for the two level formats in Figure~\ref{fig:taco_levels}.
 
 \begin{table}[h]
 \centering
@@ -42,21 +63,47 @@ All of the works in this section (except for Sparseloop\cite{sparseloop} itself)
 \textbf{Level Type} & \multicolumn{3}{c|}{\textbf{Capabilities}} & \multicolumn{5}{c|}{\textbf{Properties}} \\ 
 & \textbf{Iteration} & \textbf{Locate} & \textbf{Assembly} & \textbf{Full} & \textbf{Ordered} & \textbf{Unique} & \textbf{Branchless} & \textbf{Compact} \\
 \hline
-Dense      & V & \checkmark & I & \checkmark & (\checkmark) & (\checkmark) & & \checkmark \\
+Uncompressed      & V & \checkmark & I & \checkmark & (\checkmark) & (\checkmark) & & \checkmark \\
 Compressed & P & & A & (\checkmark) & (\checkmark) & (\checkmark) & & \checkmark \\
-Singleton  & P & & A & (\checkmark) & (\checkmark) & (\checkmark) & \checkmark & \checkmark \\
 \hline
 \end{tabular}
 }
 \label{tab:taco_capabilities_properties}
 \end{table}
 
+TACO level format capabilities comprise
+
+\begin{itemize}
+    \item \textbf{Iteration -} A set of methods for traversing a sparse tensor rank with the specified level format.
+    \begin{itemize}
+        \item \textbf{Value iteration -} Iterate through dense coordinates (not supported by the Compressed level format.)
+        \item \textbf{Position iteration -} Iterate through elements which have entries in the \textit{pos} data structure.
+    \end{itemize}
+    \item \textbf{Locate -} Random-access lookup into a ``coordinate hierarchy level''. Lookup is by coordinate-value.
+    \item \textbf{Assembly -} Additional capabilities for adding new coordinates to a level.
+    \begin{itemize}
+        \item \textbf{Insert -} Random-access insert a coordinate into some level at specified \textit{position.}
+        \item \textbf{Append -} Append a coordinate at the end of a level.
+    \end{itemize}
+\end{itemize}
+
+TACO level format properties comprise
+
+\begin{itemize}
+    \item \textbf{Full -} Among coordinates sharing the same ancestor at a given level, all coordinates are explicitly represented (counterexample: a compressed level format.)
+    \item \textbf{Ordered -} Among coordinates sharing the same ancestor at a given level, coordinates are in sorted increasing order.
+    \item \textbf{Unique -} Among coordinates sharing the same ancestor at a given level, every coordinate is encoded at most once at a g (counterexample: COO.)
+    \item \textbf{Branchless -} No coordinates have siblings and every coordinate in the previous level has a child.
+    \item \textbf{Compact -} There are no empty encodings in the level representation - ``no coordinates are separated by an unlabeled node that does not encode a coordinate''
+\end{itemize}
 
 \subsection{\textit{Efficient Processing}}
 
 \textit{Efficient Processing of Deep Neural Networks}\cite{szebook} (Sze, Chen, et. al. 2020) (\textit{Efficient Processing} for short) introduced a number of abstractions for representing tensors in memory, for compressing tensor ranks, and for representing sparse dataflows. In practice the latter is closest to an existing taxonomy of SAF microarchitecture. 
 
 \subsubsection{\textit{Efficient Processing} fibertree abstraction}
+
+Building on \cite{taco_format} (Section~\ref{sec:taco_format}) as well as \cite{extensor},
 
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{figures/efficient_processing_fibertree.png}
@@ -71,6 +118,8 @@ Singleton  & P & & A & (\checkmark) & (\checkmark) & (\checkmark) & \checkmark &
 \paragraph{Parts of a fibertree.}
 
 \paragraph{Tensor notation.}
+
+T-<\textbf{FIBER-REGEX}>(RANK-ID-LIST)
 
 \subsubsection{\textit{Efficient Processing} Taxonomy of representation formats}
 
@@ -242,30 +291,109 @@ Prior research on sparse tensor acclerators proposes many different SAF microarc
 
 The Eyeriss v2\cite{eyerissv2} PE implements a leader-follower skipping SAF, devoting only 8\% of its PE area to the skipping microarchitecture. This is owing to a lightweight leader-follower skipping microarchitecture which operates on sparse weights and activations in Compressed-Sparse Column (CSC) format. 
 
-In contrast, the SparTen\cite{sparten} accelerator PE uses most of its PE area for the bidirectional skipping microarchitecture which operates on Bitmask-format metadata. As will be shown later, this is attributable to the substantial load-handling capability which the skipping microarchitecture must have in order to maintain high arithmetic hardware utilization. 
+In contrast, most of the area of the SparTen\cite{sparten} accelerator PE is devoted to the bidirectional skipping microarchitecture which operates on bitmask-format metadata.
 
-As a final example, the GAMMA\cite{gamma} accelerator PE devotes 30\% of its PE area - a significant amount - in order to apply a rank swap\footnote{Rank swap refers to transposing tensor rank traversal order, as described in\cite{sparse_arch_lecture1}.}. The PE employs a row-wise product dataflow for loading CSR-format GEMM ($C_{M\times N} = A_{M\times K} \times B_{K\times N}$) operands from memory. A single $A_{M\times K}$ element and a row of $B_{K\times N}$ elements are loaded from on-chip memory into the PE; this reflects that the $N$ rank of B is traversed in the inner-most loop, while the contracted $K$ rank is traversed at an intermediate loop level. Row-wise product enables a cheap leader-follower skipping microarchitecture to be employed for loading $B_{K\times N}$ rows conditional on non-zero $A_{M\times K}$ elements. Upon receiving $A_{M\times K}$ and $B_{K\times N}$ values from memory, the GAMMA PE implements a rank-swap which moves the contracted dimension $K$ into the innermost loop. This enables inner-product accumulation into a single PE output register. The output memory footprint saved by the rank-swap is significant: a design such as MatRaptor\cite{matraptor} which implements row-wise product \textit{without} a rank-swap must store and incrementally accumulate $|K|$ rows of partial outputs, each of size $1 \times |N|$, requiring increased output memory footprint. Given the benefit of rank-swap, is there a tradeoff involved in using it? The use of CSR in GAMMA, means thank rank-swap requires a merge primitive (analogous to the merge operation in mergesort) in order to do a stable sort of $B_{K\times N}$ operand data by $K$ coordinate metadata, effectively implementing a transpose. GAMMA employs a radix-64 merge unit\cite{gamma} in order to do this. Although the rank-swap itself is not a sparse optimization, nonetheless the need for this type of merge unit results from employing a rank-swapped dataflow \textit{in the context of employing CSR format for the $B_{K\times N}$ operand}. Thus it is justifiable to say that the merge unit is part of the format microarchitecture which implements the CSR format SAF. It is this format microarchitecture which accounts for 30\% of PE area in GAMMA.
+As a final example, the GAMMA\cite{gamma} accelerator PE devotes 30\% of its PE area - a significant amount - in order to apply a rank swap\footnote{Rank swap refers to transposing tensor rank traversal order, as described in\cite{sparse_arch_lecture1}.}. 
 
 Clearly, SAFs and SAF microarchitecture designs are complex and impactful design decisions, and it is desirable to know whether a particular combination of SAFs will lead to the substantial PE implementation overhead seen (for example) in SparTen and GAMMA. The rest of this work develops a conceptual framework for taxonomy and modeling of SAF microarchitectures. This conceptual framework can be represented in software and utilized to make SAF microarchitecture design decisions using analytical pre-RTL modeling tools.
 
 \subsection{Existing SAF microarchitecture designs}
 
+\begin{table}[h]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{||l|l|l|l|l|l||}
+\hline
+\hline
+\textbf{Design} & \textbf{Workload} & \textbf{Sparse formats} & \textbf{Action SAFs} & \textbf{$\mu$arch primitives} \\
+\hline
+\hline
+Eyeriss\cite{eyeriss} & DNN\cite{eyeriss}\cite{sparseloop} & \parbox[t]{5cm}{\cite{eyeriss}\cite{sparseloop}: \\ offchip: \\ - I/O: B-RLE \\ - W:U \\ onchip: \\ - I: UB \\ - O/W:U} & \parbox[t]{5cm}{\cite{eyeriss}\cite{sparseloop}: \\ Innermost storage: \\ - Gate W $<$- I \\ - Gate O $<$- I} & RLE (de)comp.\cite{eyeriss} \\
+\hline
+SparTen\cite{sparten} & DNN\cite{sparten} & - B (PE)\cite{sparten} & Skip (BD) (PE)\cite{sparten} & \parbox[t]{5cm}{\cite{sparten}: \\ B isect. \\ Pref.-sum (B$->$pos) \\ Pri.-enc. (compaction)} \\
+\hline
+Eyeriss v2\cite{eyerissv2} & DNN\cite{sparseloop}\cite{eyerissv2} & \parbox[t]{5cm}{\cite{eyerissv2}\cite{sparseloop}: \\ - I/W: B-UOP-CP (B-CSC) \\ - O:U} & \parbox[t]{5cm}{\cite{eyerissv2}: \\ Innermost storage: \\ - Skip W $<$- I \\ - Skip O $<$- I \& W \\ - Gate Compute} & \\
+\hline
+Cambricon-X\cite{cambricon_x} & DNN\cite{cambricon_x} & & & \\
+\hline
+Cnvlutin\cite{cnvlutin} & DNN\cite{cnvlutin} & & & \\
+\hline
+EIE\cite{eie} & DNN\cite{eie} & & & \\
+\hline
+ExTensor\cite{extensor} & MM\cite{extensor}\cite{sparseloop} & \parbox[t]{5cm}{\cite{extensor} \\ - A/B: UOP-CPx5 \\ - Z: U} & \parbox[t]{5cm}{All Storage: \\ - Skip A$<->$B \\ - Skip Z$<->$A\&B} & - C isect. \\
+\hline
+MatRaptor\cite{matraptor} & MM\cite{matraptor}\cite{teaal} & - C$^2$SR\cite{matraptor} & Skip B $<$- A & Psum. merge \\
+\hline
+SIGMA\cite{sigma} & MM\cite{sigma}\cite{teaal} & \parbox[t]{5cm}{B} & & \\
+\hline
+SpArch\cite{sparch} & MM\cite{sparch}\cite{teaal} & & & Parallel merge\cite{sparch} \\
+\hline
+Tensaurus\cite{tensaurus} & Some einsums\cite{tensaurus}\cite{teaal} & & & \\
+\hline
+GAMMA\cite{gamma} & MM\cite{gamma}\cite{teaal} & \parbox[t]{5cm}{\cite{gamma}: \\ - A: CSR \\ - B: CSR}  & \parbox[t]{5cm}{Skip B $<$- A} & \parbox[t]{5cm}{- Transp. merge-and-sum \\ - Fiber fetcher \\ - Leader val. LUT \\ } \\
+\hline
+\hline
+\end{tabular}%
+}
+\caption{Summary of Designs}
+\end{table}
+
+%\begin{table}[h]
+%\centering
+%\resizebox{\textwidth}{!}{%
+%\begin{tabular}{||l|l|l|l|l|l||}
+%\hline
+%\hline
+%\textbf{Design} & \textbf{Workload} & \textbf{Sparse %formats} & \textbf{Action SAFs} & \textbf{$\mu$arch primitives} \\
+%\hline
+%\hline
+%Eyeriss\cite{eyeriss} & DNN\cite{eyeriss}\cite{sparseloop} & \parbox[t]{5cm}{\cite{eyeriss}\cite{sparseloop}: \\ offchip: \\ - I/O: B-RLE \\ - W:U \\ onchip: \\ - I: UB \\ %- O/W:U} & \parbox[t]{5cm}%{\cite{eyeriss}\cite{sparseloop}: \\ Innermost storage: \\ - Gate W $<$- I \\ - Gate O $<$- I} & RLE (de)comp.\cite{eyeriss} \\
+%\hline
+%SparTen\cite{sparten} & DNN\cite{sparten} & - B (PE)\cite{sparten} & Skip (BD) (PE)\cite{sparten} & \parbox[t]{5cm}{\cite{sparten}: \\ B isect. \\ Pref.-sum (B$->$pos) \\ Pri.-enc. (compaction)} \\
+%\hline
+%Eyeriss v2\cite{eyerissv2} & DNN\cite{sparseloop}\cite{eyerissv2} & \parbox[t]{5cm}{\cite{eyerissv2}\cite{sparseloop}: \\ - I/W: B-UOP-CP (B-CSC) \\ - O:U} & \parbox[t]{5cm}{\cite{eyerissv2}: \\ Innermost storage: \\ - Skip W $<$- I \\ - Skip O $<$- I \& W \\ - Gate Compute} & \\
+%\hline
+%Cambricon-X\cite{cambricon_x} & DNN\cite{cambricon_x} & & & \\
+%\hline
+%Cnvlutin\cite{cnvlutin} & DNN\cite{cnvlutin} & & & \\
+%\hline
+%EIE\cite{eie} & DNN\cite{eie} & & & \\
+%\hline
+%ExTensor\cite{extensor} & MM\cite{extensor}\cite{sparseloop} & \parbox[t]{5cm}{\cite{extensor} \\ - A/B: UOP-CPx5 \\ - Z: U} & \parbox[t]{5cm}{All Storage: \\ - Skip A$<->$B \\ - Skip Z$<->$A\&B} & - C isect. \\
+%\hline
+%MatRaptor\cite{matraptor} & MM\cite{matraptor}\cite{teaal} & - C$^2$SR\cite{matraptor} & Skip B $<$- A & Psum. merge \\
+%\hline
+%SIGMA\cite{sigma} & MM\cite{sigma}\cite{teaal} & \parbox[t]{5cm}{B} & & \\
+%\hline
+%SpArch\cite{sparch} & MM\cite{sparch}\cite{teaal} & & & Parallel merge\cite{sparch} \\
+%\hline
+%Tensaurus\cite{tensaurus} & Some einsums\cite{tensaurus}\cite{teaal} & & & \\
+%\hline
+%GAMMA\cite{gamma} & MM\cite{gamma}\cite{teaal} & \parbox[t]{5cm}{\cite{gamma}: \\ - A: CSR \\ - B: CSR}  & \parbox[t]{5cm}{Skip B $<$- A} & \parbox[t]{5cm}{- Transp. merge-and-sum \\ - Fiber fetcher \\ - Leader val. LUT \\ } \\
+%\hline
+%\hline
+%\end{tabular}%
+%}
+%\caption{Summary of Designs}
+%\end{table}
+
+
 %
 % Figure: prior work
 %
-\begin{table}[ht]
-\begin{tabular}{c|c|}
-\textbf{Accelerator} & \textbf{SAF microarchitecture proposals} \\ \hline \hline
-Eyeriss &  MAC gating; in-flight RLE decompression \\ \hline
-Eyeriss v2 & CSC zero-skipping \\ \hline
-ExTensor & Hierarchical bidirectional zero-skipping \\ \hline
-SCNN & Memory conflict handling (binning output coordinates) \\ \hline
-SparTen & Bitmask zero-skipping, parallel compression, memory conflict handling \\ \hline
-OuterSPACE & Software rank-swap \\ \hline
-GAMMA & Leader-following intersection, hardware rank-swap \\ \hline
-\end{tabular}
-\caption{A non-exhaustive list of published tensor accelerators and their proposed SAF microarchitectures.}
-\label{tab:design_specific_models}
-\centering
-\end{table}
+%\begin{table}[ht]
+%\begin{tabular}{c|c|}
+%\textbf{Accelerator} & \textbf{SAF microarchitecture proposals} \\ \hline \hline
+%Eyeriss &  MAC gating; in-flight RLE decompression \\ \hline
+%Eyeriss v2 & CSC zero-skipping \\ \hline
+%ExTensor & Hierarchical bidirectional zero-skipping \\ \hline
+%SCNN & Memory conflict handling (binning output coordinates) \\ \hline
+%SparTen & Bitmask zero-skipping, parallel compression, memory conflict handling \\ \hline
+%OuterSPACE & Software rank-swap \\ \hline
+%GAMMA & Leader-following intersection, hardware rank-swap \\ \hline
+%\end{tabular}
+%\caption{A non-exhaustive list of published tensor accelerators and their proposed SAF microarchitectures.}
+%\label{tab:design_specific_models}
+%\centering
+%\end{table}
 

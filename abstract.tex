@@ -13,7 +13,7 @@
 
 % , utilizing simple formulae for \textit{architectural} compute and memory savings from sparse acceleration features (SAFs.) 
 
-Specialized microarchitectures such as intersection units have been exploited to great effect in the design of sparse tensor accelerators. Despite considerable research having been done, prior work lacks consistent abstractions, systematic design-space exploration, and apples-to-apples comparison between alternative microarchitecture proposals.
+Specialized microarchitectures for exploiting sparsity have critical to the design of sparse tensor accelerators. Despite considerable research having been done, prior work lacks consistent abstractions, systematic design-space exploration, and apples-to-apples comparison between alternative microarchitecture proposals.
 
 Sparseloop (in combination with the Accelergy modeling framework) is an example of an existing tool which attempts to analytically model sparsity optimizations, known as Sparse Acceleration Features (SAFs.) Sparseloop effectively models key metrics such as energy, area and cycles at the architecture-level in the presence of sparsity optimizations. However, lacking models of microarchitectural primitives and design topologies, Sparseloop is unable to lower its sparsity abstractions onto a model of microarchitectural costs. Thus Sparseloop cannot capture the energy/area/time overhead incurred by SAF microarchitectures.
 
