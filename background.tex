@@ -92,9 +92,9 @@ TACO level format properties comprise
 \begin{itemize}
     \item \textbf{Full -} Among coordinates sharing the same ancestor at a given level, all coordinates are explicitly represented (counterexample: a compressed level format.)
     \item \textbf{Ordered -} Among coordinates sharing the same ancestor at a given level, coordinates are in sorted increasing order.
-    \item \textbf{Unique -} Among coordinates sharing the same ancestor at a given level, every coordinate is encoded at most once at a g (counterexample: COO.)
+    \item \textbf{Unique -} Among coordinates sharing the same ancestor at a given level, every coordinate is encoded at most once (counterexample: COO.)
     \item \textbf{Branchless -} No coordinates have siblings and every coordinate in the previous level has a child.
-    \item \textbf{Compact -} There are no empty encodings in the level representation - ``no coordinates are separated by an unlabeled node that does not encode a coordinate''
+    \item \textbf{Compact -} There are no empty encodings in the level representation - ``no coordinates are separated by an unlabeled node that does not encode a coordinate''\cite{taco_format}
 \end{itemize}
 
 \subsection{\textit{Efficient Processing}}
@@ -103,7 +103,19 @@ TACO level format properties comprise
 
 \subsubsection{\textit{Efficient Processing} fibertree abstraction}
 
-Building on \cite{taco_format} (Section~\ref{sec:taco_format}) as well as \cite{extensor},
+Building on \cite{taco_format} (Section~\ref{sec:taco_format}) as well as \cite{extensor}, the authors of \textit{Efficient Processing} proposed a TACO-like hierarchical representation of sparse tensors, called the ``fibertree'' abstraction (Figure~\ref{fig:efficient_processing_fibertree}.) The TACO level format abstraction was motivated by avoiding the need to hard-code a new data structure and new sparse dataflow for each new representation format TACO supports\cite{taco_format}; the \textit{Efficient Processing} fibertree abstraction is motivated by a desire to decouple sparse representation format from sparse dataflow for hardware engineers in the early stages of design and planning\cite{szebook}. As with TACO\cite{taco_format}, \textit{Efficient Processing} defines a set of possible sparse representation formats, and then builds a framework for composing them into sparse tensor representation formats.
+
+\subsubsection{Taxonomy of sparse representation formats}
+
+\textit{Efficient Processing} introduced a taxonomy of sparse representation formats 
+
+%\begin{figure}[H]
+%\includegraphics[width=\textwidth]{figures/representat}
+%\caption{An example of the \textit{Efficient Processing} fibertree abstraction, applied to the matrix in Figure~\ref{fig:taco_matrix}.}
+%\label{fig:efficient_processing_fibertree}
+%\end{figure}
+
+\subsubsection{Fibertrees}
 
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{figures/efficient_processing_fibertree.png}
@@ -111,20 +123,33 @@ Building on \cite{taco_format} (Section~\ref{sec:taco_format}) as well as \cite{
 \label{fig:efficient_processing_fibertree}
 \end{figure}
 
-
-
-\textit{Efficient Processing} utilized the \textit{fibertree} abstraction for representing sparse tensors.
+As with the TACO framework for describing sparse representation formats, a fibertree is a tiered structure assembled by composing named levels - \textit{ranks}. As with the CSF format\cite{csf}, each rank represents a tensor axis. A rank contains multiple \textit{fibers}, and each fiber is an sort-ordered list of coordinates which is itself the child of a coordinate in the next higher rank; each coordinate has a child - a \textit{payload} - which is either a fiber in the next lower rank, or the value of an element in the tensor. Unlike the TACO framework, fibertree ranks abstract away the details of memory layout that are discussed in \cite{taco_format}.
 
 \paragraph{Parts of a fibertree.}
 
-\paragraph{Tensor notation.}
+\begin{itemize}
+    \item \textbf{Rank:} A representation of a tensor axis, assigned a name \textit{rank-id}.
+    \item \textbf{Coordinate:} A numeric identifier associated each element or item in a rank.
+    \item \textbf{Payload:} The ``value'' associated with a given coordinate in a fiber. Only the lowest rank of a fibertree associates coordinates with payloads which are singleton data values; otherwise, payloads of a coordinate in a given rank are actually \textit{sub-trees} rooted at the given coordinate.
+    \item \textbf{Point:} The set of coordinates which represent a path from the root of the tensor to the element of interest
+\end{itemize}
 
-T-<\textbf{FIBER-REGEX}>(RANK-ID-LIST)
+\paragraph{Tensor notation.} \textit{Efficient Processing} introduced \textit{tensor representation notation}\cite{szebook} for concisely describing a fibertree in terms of its sequence of rank formats, from top to bottom in the fibertree:
 
-\subsubsection{\textit{Efficient Processing} Taxonomy of representation formats}
+Tensor-<\textbf{FIBER-REPRESENTATION-REGEX}>(RANK-ID...)
 
-\textit{Efficient Processing} introduced a taxonomy of sparse representation formats (from which Sparseloop\cite{sparseloop}
-derived the Uncompressed, Coordinate-payload, Run-length-encoding, and Bitmask representation formats.) 
+or more concisely,
+
+T-<\textbf{FIBER-REPRESENTATION-REGEX}>(RANK-ID...)
+
+where
+
+\begin{itemize}
+    \item \textbf{FIBER-REPRESENTATION-REGEX} is a list of sparse representation format abbreviations which matches the rank formats in the fibertree, from top to bottom.
+    \item \textbf{RANK-ID} is a list of rank names, from top to bottom in the fibertree.
+\end{itemize}
+
+So for example, describing the fibertree in Figure~\ref{fig:efficient_processing_fibertree} as T-<CC>(HW) means that it has two ranks, named \textbf{H} and \textbf{W}, which are both in coordinate payload (C) format.
 
 \subsubsection{\textit{Efficient Processing} Sparse dataflow \& SAF microarchitecture primitives}
 
@@ -180,11 +205,18 @@ These are also the four possible port datatypes. There are nine primitives in th
 
 As a way of illustrating different sparse dataflows, Section 8.3 of \textit{Efficient Processing} expresses a number of contemporary sparse tensor accelerator designs (\cite{cambricon_x}\cite{cnvlutin}\cite{scnn}\cite{sparten}\cite{eyerissv2}\cite{eie}\cite{extensor}), first in sparse loop nest form, and then as microarchitecture topologies which implement the sparse loop nests.
 
-\subsection{Sparse abstract machine}
+% \subsection{Sparse abstract machine}
 
 \subsection{Sparseloop}
 
-Sparseloop\cite{sparseloop} developed a unified taxonomy of Sparse Acceleration Features (SAFs), architectural optimization strategies for exploiting sparsity (zero-sparsity) to conserve energy and cycles. A SAF is a strictly declarative description of an optimization, comprising (1) a description of the optimization outcome (i.e. skipping of certain compute operatinos), (2) a set of attributes which modulate the outcome of the optimization, and (3) a binding to a particular architectural buffer or compute component. A SAF describes neither the microarchitectural implementation of the optimization, nor the interfaces or communication protocols involved in integrating the microarchitectural implementation into the design. 
+Section~\ref{chapter:introduction} briefly introduced Accelergy\cite{accelergy}, Timeloop\cite{timeloop}, and Sparseloop\cite{sparseloop}. Put briefly -
+
+\begin{itemize}
+    \item Accelergy\cite{accelergy} is a framework for pre-RTL analytical modeling of hardware components. Conceptually, the authors of Accelergy propose a framework in which (1) the cost of a component is modeled as an area value, as well as a set of energy values associated with specific actions (``energy-per-action'') defined by the modeling engineer, (2) reuse of models is maximized through support for \textit{compound component} models which derive area and energy-per-action from the composition of multiple \textit{primitive components}, and (3) component models are parameterized, allowing the modeling engineer to scale a component's bitwidth, number of memory banks, etc. in order to support the workload that is being modeled. Practically, the Accelergy framework is surfaced to users as a CLI tool for evaluated area and energy per action, given a model description or description(s) and associated model parameters.
+    \item Timeloop\cite{timeloop} is a framework for fast analytical modeling of \textit{dense} tensor accelerators. ``Fast analytical modeling'' is positioned in contrast to (1) cycle-accurate simulation, which may be time-consuming, and (2) layout-level simulation modeling, which is almost always very-consuming\cite{wattch}. Timeloop is capable of modeling architectural energy, area, memory footprint, and memory accesses, as well as dataflow\cite{timeloop}; Timeloop is intended to support early-stage design-space exploration and trade-off decisions by ASIC architects, long before the accelerator is actually implemented.
+\end{itemize}
+
+Sparseloop\cite{sparseloop} extends Timeloop with support for Sparsity. Sparseloop developed a unified taxonomy of Sparse Acceleration Features (SAFs), architectural optimization strategies for exploiting sparsity (zero-sparsity) to conserve energy and cycles. A SAF is a strictly declarative description of an optimization, comprising (1) a description of the optimization outcome (i.e. skipping of certain compute operatinos), (2) a set of attributes which modulate the outcome of the optimization, and (3) a binding to a particular architectural buffer or compute component. A SAF describes neither the microarchitectural implementation of the optimization, nor the interfaces or communication protocols involved in integrating the microarchitectural implementation into the design. 
 
 Nonetheless, a real design would require a microarchitectural change which implements the optimization, referred to here as the \textit{SAF microarchitecture.} Existing analytical modeling tools\cite{sparseloop} model only the benefits of exploiting SAFs (savings on memory capacity, fewer memory accesses, fewer compute cycles); these benefits are introduced in Section~\ref{background:safs}. These tools avoid modeling the costs of SAF microarchitectures by assuming (1) an ideal SAF microarchitecture which perfectly implements the SAF, and (2) a SAF microarchitecture with negligible energy and area overhead.
 

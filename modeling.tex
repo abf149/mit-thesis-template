@@ -174,3 +174,12 @@ Returning to the previous example where we had a component connected by a wire t
 \subsection{Building an MINLP optimization problem}
 
 Applying this process to the topology of an entire architecture, we are able to obtain a large set of inequalities which define the feasible regions for all of the RTL blocks comprising all of the microarchitectural components. And then we can set up a mixed-integer nonlinear program problem which tries to simultaneously solve for a set of all load spaces that is compatible with some assignment of scale space points to all components. The solution to this problem allows us to determine the scaling of all microarchitecture components in the design.
+
+\section{Modeling intersection units}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/isect_model.pdf}
+    \caption{Diagram of the relationship between the scale parameters of a vector-pipelined intersection unit (vectorization, vector-pipeline depth), and the match throughput.}
+    \label{fig:isect_model}
+\end{figure}
