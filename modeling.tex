@@ -1,6 +1,25 @@
 \chapter{Modeling techniques for SAF microarchitectures}
 \label{chapter:modeling}
 
+This section will introduce the overarching modeling strategy employed in this work, tying together energy, area and workload modeling into a single scheme. The following considerations are relevant:
+
+\begin{itemize}
+    \item Recall from Chapter~\ref{chapter:conceptual_framework} that one of the goals of this work is to associate SAF microarchitecture primitives with analytical cost models (i.e. models of energy and area.) Toward that end, Chapter~\ref{chapter:rtl} introduced a number of RTL designs which were developed and characterized for this work.
+    \item However, we still need a way to convert RTL characerization results, into SAF microarchitecture primitive models with well-defined energy-per-action and area.
+    \item Also recall from Chapter~\ref{chapter:conceptual_framework} that another goal of this work is to decouple SAF microarchitecture from architecture and dataflow. As shown in Figure~\ref{fig:sparse_sbuff_wkld_overview}, we hope to encapsulate all details of architecture and dataflow behind format interfaces with well-defined measures of workload.
+\end{itemize}
+
+Recall that the RTL in Chapter~\ref{chapter:rtl} is parameterized. The power-consumption and area of RTL components will scale with the parameter values. However, more subtly, the \textit{load-handling capability} of the RTL components also scales with the parameter values. For example, a naive two-finger-merge-based intersection unit will be able to intersect more input operands per cycle, if it is constructed with a greater degree of input vectorization; or, a prefix sum unit designed for operands which have some number of bits, will be able to support operands with a larger range of possible values if the number of bits is increased. Thus RTL parameters represent a tradeoff between cost (power, area) and load-handling capability; going forward these parameters will be referred to as \textit{scale parameters.}
+
+The motivation for assigning a measure of workload to each format interface at the outset, is so that the scale parameters of the SAF microarchitecture may be tuned properly. The SAF microarchitecture scale parameters should be set such that
+
+\begin{itemize}
+    \item The SAF microarchitecture can process sparse format metadata at the rate which it is being served over the format interface by the smartbuffer.
+    \item The SAF microarchitecture is capable of serving processed outputs back to the buffer via the format interface, at the rate which the buffer was designed for.
+\end{itemize}
+
+Failure to meet either of the above requirements should in principle lead to a slowdown in the whole design.
+
 Before we can perform SAF microarchitecture design-space exploration, we first require SAF microarchitecture models. Otherwise comparison between SAF microarchitecture designs is impossible.
 
 This section will introduce (1) the structure of energy/area models developed in this work, (2) a method for modeling SAF microarchitecture workloads in sparse tensor accelerators, and (3) a process for scaling up the SAF microarchitecture to match the magnitude of the workload imposed upon it.
@@ -79,6 +98,7 @@ However, it quickly becomes apparent that load and load-handling ability are mul
     The point is, sparsity $s$ matters because it \textit{sometimes} modulates the microarchitectural throughput-handling requirement imposed by a fiber's local architectural throughput, and thus fiber sparsity is a key dimension of load.
 
 \subsection{Loadspaces}
+\label{sec:loadspaces}
 
 To concisely and effectively model loading and load-handling capability, this work builds on the concept of \textit{dataspaces} from Timeloop\cite{timeloop}.
 
@@ -96,19 +116,19 @@ To characterize loading, here the concept of a \textit{loadspace} is introduced.
         \centering
         \caption{Mnemonics for workload dimensions.}
         \label{table:workload_dimension_mnemonics}
-        \begin{tabular}{||c|c|c||}
+        \begin{tabular}{||c|c|c|c||}
             \hline \hline
-            Workload Dimension & Mnemonic & Stands for \\
+            Workload Dimension & Mnemonic & Stands for & Units \\
             \hline \hline
-            Dense rank size & nc & num. coordinates \\
+            Dense rank size & nc & num. coordinates & Coordinates \\
             \hline
-            Local throughput & pr & position rate \\
+            Local throughput & pr & position rate & Words/Cycle \\
             \hline
-            Coordinate throughput & cr & coordinate rate \\
+            Sparsity & sp & sparsity & \% \\
             \hline
-            Bitwidth & ww & word width \\
+            Bitwidth & ww & word width & Bits \\
             \hline
-            Bandwidth & rw & read width \\
+            Bandwidth & bw & read width & Bits \\
             \hline \hline
         \end{tabular}
     \end{table}
@@ -122,6 +142,69 @@ Thus, analogous to load spaces, we need a way to capture the different dimension
 Now we can see how scale spaces and load spaces together allow us to define or solve problems in energy and area modeling. So if we consider a microarchitecture with a scale space that has two ranks and connected to a set of interfaces that collectively have a load space with two ranks,
 
 Each point in the scale space is thus associated with a different energy area combination of values derived from characterization of the RTL .
+
+\subsection{Specifying a SAF microarchitecture primitive model}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/workload_example.pdf}
+    \caption{Example of SAF microarchitecture scale inference, via daisy-chained workload solving.}
+    \label{fig:workload_example}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/rtl_objective.pdf}
+    \caption{Demonstration of how SAF microarchitecture scale inference makes it possible to derive values for energy and area objective functions.}
+    \label{fig:rtl_objective}
+\end{figure}
+
+For modeling purposes, a SAF microarchitecture primitive model may be described entirely in terms of:
+
+\begin{itemize}
+    \item \textbf{RTL blocks -} A list of RTL modules or ``blocks'' from Chapter~\ref{chapter:rtl} which comprise the component being modeled. Figure~\ref{fig:rtl_objective} reflects that each SAF microarchitecture component may be associated with zero or more characterized RTL components. When the user defines the model of a SAF microarchitecture primitive, they must specify the list of related RTL blocks explicitly.
+    \begin{itemize}
+        \item \textbf{RTL parameters -} Each RTL block has zero or more parameters which customize the digital logic implementation as a function of the parameter values. RTL parameter values also impact the energy and area cost of a component. The notation for a given RTL parameter is $rtl\_name.param\_name$
+        \item \textbf{Example -} A coordinate-payload-format\cite{sparseloop}\cite{szebook} intersection unit\cite{extensor} may (within the context of this work) be constructed out of EXACTLY ONE OF the following RTL blocks defined in Chapter~\ref{chapter:rtl}: a two-fingered intersection unit\cite{extensor}, a skip-ahead intersection unit\cite{extensor}, or a direct-mapped intersection unit.\cite{extensor} (of course the modeling library could be extended to support other options derived from the literature.) The input vectorization parameter of an intersection unit $isect$ would be represented notationally as $isect.md_in_vectorization$.
+    \end{itemize}
+    \item \textbf{Scale parameters -} A set of parameters which determine the component's load-handling capability. Figure~\ref{fig:workload_example} shows that each component is associated with a vector of scale parameter values. \textbf{Critically, scale parameters are distinct from taxonomic attributes} - taxonomic attributes are high-level characteristics which reflect choices about algorithm or scaling behavior; once the taxonomic attributes have been specified, \textit{scale parameters represent the low-level design space for implementing the particular taxonomic description.}
+    \begin{itemize}
+        \item \textbf{Notation -} $S_x$ is the vector of scale parameters for component $x$.
+        \item \textbf{Example -} The scale parameters of a prefix-sum unit are (1) its \textbf{word bitwidth}, and (2) its \textbf{degree of vectorization}. The prefix-sum unit cannot sum a vector which is larger than its vector scale parameter. It cannot correctly sum a vector with words which have more bits than the prefix-sum unit's word bitwidth scale parameter.
+    \end{itemize}
+    \item \textbf{Constitutive relations -} A component is uniquely described by its energy, area, and workload models. The component's \textit{constitutive relations} define a unique set of relationships between these quantities; the constitutive relations should express an intuition about how the component functions, with specific characterized cost (energy/area) metrics for RTL blocks. Constitutive relations are specified at the time when the user writes a SAFTools model. \textbf{The key constitutive relations are:}
+    \begin{itemize}
+        \item \textbf{Interface constraints.} The interface relations set \textbf{upper-bounds} on workload at each component input port (i.e. upper-bounds on each dimension of the workload vector at an input port.) This is reflected by Figure~\ref{fig:workload_example}(ii). These upper-bounds are a function of the scale parameter values $S$.
+        \begin{itemize}
+            \item \textbf{Notation.} $I[S](w_{port0},w_{port1},...)$ is a set of interface constraints on a set of ports' workloads, parameterized by the scale parameters $S$. Typically, $I[S]()$ imposes \textit{upper-bounds}, and upper-bounds increase as $S$ increases along any dimension. \textbf{Critically, component energy/area cost also increases as $S_{comp}$ increases along any dimension.}
+            \item \textbf{Corollary.} If a component has scale parameters $S_{comp}$ and the workload applied at $port0$ violates the constraint(s) $I[S_{comp}](port0)$, one can perform ``design-space exploration'' or ``tuning'' of $S_{comp}$ in order to find the minimum-cost $S^\prime_{comp}$ for which $I[S^\prime_{comp}](port0)$ is satisfied by the workload at port0. This is represented in Figure~\ref{fig:workload_example}(ii), where the scale parameters $S_0$ are adjusted to $S^\prime_0$ such that component 0 will support its input workload.
+        \end{itemize}
+        \item \textbf{Transfer relations.} The transfer relations are \textbf{equations or upper-bound inequalities on output-port workload(s) as a function of input-port workload(s)}; like interface constraints, transfer relations are parameterized by scale parameters. Figure~\ref{fig:workload_example} (iii) and (iv) show how output workload values (or bounds) are derived from input workloads via transfer relations. Transfer relations capture a key intuition that \textbf{SAF microarchitecture primitives frequently exploit forms of filtering or compaction, operations which yield fewer outputs (or fewer \textit{valid outputs}) than inputs.} Critically, this means that if component 0 is loaded by the output of a smartbuffer, and component 1 is loaded by the output of component 0 (as is the case in Figure~\ref{fig:workload_example}), the workload at component 1's input port may not be the same as the workload which the smartbuffer imposes on the input port of component 0.
+        \begin{itemize}
+            \item \textbf{Notation.} $T[S_{comp}](w_{port\_in0},w_{port\_in1},...)$
+            \item \textbf{Example.} Intersecting two compressed sparse coordinate payload fibers, with $C_0$ and $C_1$ non-zero values respectively, necessarily yields an output stream which will contain $C_{out}$ non-zero matching metadata values, where $C_{out} \leq C_0$ and $C_{out} \leq C_1$. Suppose that we know (for sake of simplicity) that $C_{out} = 0.5 C_0$. Then $T[S_{comp}](w_{port\_in0},w_{port\_in1},...)$ is a set containing two relations:
+
+            \[w_{port\_out,pr} \leq 0.5 w_{port\_in0,pr}\]
+
+            \[w_{port\_out,pr} \leq 0.5 w_{port\_in1,pr}\]
+
+            where $w_{port\_out,pr}$, $w_{port\_in0,pr}$ and $w_{port\_in1,pr}$ represent the \textbf{local throughput dimension (mnemonic ``pr'')} of the $port\_out$, $port\_in0$, and $port\_in1$ interfaces, respectively.
+            
+            \item \textbf{Example.} If two compressed sparse fibers are being intersected, the underlying dense ranks for both fibers necessarily have the same size - and furthermore, the intersected metadata stream at the intersection unit output necessarily also maps back onto the same underlying dense rank. Thus for an intersection unit, the following transfer relations also apply:
+
+            \[w_{port\_out,nc} = w_{port\_in0,nc}\]
+
+            \[w_{port\_out,nc} = w_{port\_in1,nc}\]
+
+            where the $nc$ subscript refers to the dense rank size dimension (mnemonic ``nc'') of each port's workload.
+        \end{itemize}
+        \item \textbf{Projection relations.} The projection re
+    \end{itemize}
+\end{itemize}
+
+
+
+(1) , and (2) a set of \textit{constitutive relations}  the ``workload vector'' abstraction developed in Section~\ref{sec:loadspaces}
 
 \subsection{Deriving loadspaces from architecture and sparse optimizations}
 
@@ -161,7 +244,9 @@ In other words, the projection of the load space point into scale space must lie
 
 \subsection{Circuits}
 
-TODO: talk about daisy-chaining
+\subsection{Constructing energy and action objective functions}
+
+
 
 \subsection{Component composition}
 
@@ -182,4 +267,11 @@ Applying this process to the topology of an entire architecture, we are able to 
     \includegraphics[width=0.95\textwidth]{figures/isect_model.pdf}
     \caption{Diagram of the relationship between the scale parameters of a vector-pipelined intersection unit (vectorization, vector-pipeline depth), and the match throughput.}
     \label{fig:isect_model}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/isect_model_fl8_vl4.pdf}
+    \caption{Comparison of match throughput with respect to sparsity (geomean) for fiber size 8 and input vectorization 4. The predicted match throughput values from the analytical model developed for this work, are overlaid on simulated measurements from the intersection unit cycle accurate simulators.}
+    \label{fig:isect_model_fl8_vl4}
 \end{figure}

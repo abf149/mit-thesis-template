@@ -1,5 +1,25 @@
-\chapter{SAF microarchitecture taxonomy}
+\chapter{SAF microarchitecture primitive taxonomy}
 \label{chapter:primitive_taxo_model}
+
+This section introduces a taxonomy of SAF microarchitecture primitives. Each taxonomic primitive expresses a basic operation that is key to implementing sparse tensor arithmetic, staying as close as possible to the \textit{Efficient Processing}\cite{szebook} taxonomy. 
+
+The taxonomic system in this work is modeled off of C/C++ generics: 
+
+\begin{itemize}
+    \item 
+\end{itemize}
+
+Each taxonomic primitive has
+
+\begin{itemize}
+    \item \textbf{An interface}, comprising input and output ports. Each port has one of three \textit{Efficient Processing} interface types: \textit{metadata format}, \textit{position}, or \textit{flag}.
+    \item \textbf{A set of attributes}, which serve to parameterize the primitive so that a wide range of implementation strategies may be encapsulated within the same abstract primitive but with different attribute value(s) for each implementation strategy.
+    \item \textbf{An analytical energy/area/timing model}, which is parameterized by the primitive's attributes.
+\end{itemize}
+
+In order to stay as close to the \textit{Efficient Processing} taxonomy as possible, it is desirable that the primitive's input and output ports can be understood as moving metadata, position or flag values. Thus, SAF microarchitecture primitives are \textit{not} synonymous with RTL blocks from Chapter~\ref{chapter:rtl}, because RTL blocks are not \textit{necessarily} domain-specific in the way that SAF microarchitecture primitives are. A SAF microarchitecture primitive is constructed from one or more RTL blocks, 
+
+Each of these primitives is associated with an analytical model, and larger SAF microarchitecture
 
 In this work, SAF microarchitecture categorization is intended to facilitate communication of general design principles, very early planning discussions among designers, and design-space exploration of possible SAF microarchitectures. \todo{It is important to set up a systematic way of describing components and how they connect to each other. Later, we use this taxonomy as the basis of a set of tools for inferring the SAF microarchitecture design and modeling its energy, area and latency.} \\
 %

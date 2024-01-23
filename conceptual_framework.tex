@@ -214,11 +214,61 @@ In order to even look up into the compressed-fiber-NZ values, Figure~\ref{fig:si
 
 \section{Integrating prior work}
 
+\subsection{Unified skipping microarchitecture abstraction}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/uniform_skip_topo.pdf}
+    \caption{The unified skipping microarchitecture abstraction.}
+    \label{fig:uniform_skip_topo}
+\end{figure}
+
+\subsubsection{Elaborating leader-follower skipping microarchitecture}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/prior_lf_skip.pdf}
+    \caption{Inferring leader-follower skipping microarchitecture topology.}
+    \label{fig:prior_lf_skip}
+\end{figure}
+
+\subsubsection{Elaborating bidirectional skipping microarchitecture}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/prior_bd_skip.pdf}
+    \caption{Inferring bidirectional skipping microarchitecture topology.}
+    \label{fig:prior_bd_skip}
+\end{figure}
+
+\subsection{Fill optimization}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/uniform_fopt.pdf}
+    \caption{Unified Fill Optimizer SAF microarchitecture primitive.}
+    \label{fig:uniform_fopt}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/leader_lut.pdf}
+    \caption{GAMMA\cite{gamma}-style LUT-based fill optimization.}
+    \label{fig:leader_lut}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/pipeline_bubble.pdf}
+    \caption{Eyeriss v2\cite{eyerissv2}-style pipeline-bubble-based fill optimization.}
+    \label{fig:pipeline_bubble}
+\end{figure}
+
 \section{Overview of conceptual framework proposed in this work}
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.95\textwidth]{figures/this_work_taxo.png}
+    \includegraphics[width=0.95\textwidth]{figures/this_work_taxo.pdf}
     \caption{Overview of the SAF microarchitecture taxonomy developed in this work.}
     \label{fig:this_work_taxo}
 \end{figure}
