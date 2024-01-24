@@ -107,8 +107,18 @@ Building on \cite{taco_format} (Section~\ref{sec:taco_format}) as well as \cite{
 
 \subsubsection{Taxonomy of sparse representation formats}
 
-\textit{Efficient Processing} introduced a taxonomy of sparse representation formats 
+The three representation formats studied in \textit{Efficient Processing} are
 
+\begin{itemize}
+    \item \textbf{Uncompressed (U)} - a vector as it exists in memory without any compression, including zero-value elements.
+    \item \textbf{Uncompressed Offset Pairs (UOP)} - An uncompressed fiber format in which the payloads are ranges of offsets into another rank (this is discussed in Section~\ref{sec:fibertrees}.)
+    \item \textbf{Coordinate Payload (C)} - A compressed fiber format comprising an array of non-zero payloads, each with a corresponding explicit coordinate value.
+    \item \textbf{Bitmask (B)} - A compressed fiber format comprising an array of non-zero payloads, and a metadata array which is a bitmask of length equal to the size of the underlying uncompressed rank. The indices of non-zero entries (hot bits) in the metadata bitmask are the coordinates of corresponding non-zero payloads.
+\end{itemize}
+
+\paragraph{Explicit and implicit representation formats.} \textit{Efficient Processing} categorizes sparse representation formats based on whether they have \textit{explicit coordinates} - i.e. the compressed payloads are associated with metadata that calls out specified coordinate values - or \textit{implicit coordinates} - i.e. the compressed payloads are associated with a metadata data structure which encodes coordinates but does not represent them explicitly.
+
+In this work, implicit representation formats such as bitmask will entail increased overhead owing to the need to recover explicit coordinates in certain situations.
 %\begin{figure}[H]
 %\includegraphics[width=\textwidth]{figures/representat}
 %\caption{An example of the \textit{Efficient Processing} fibertree abstraction, applied to the matrix in Figure~\ref{fig:taco_matrix}.}
@@ -116,6 +126,7 @@ Building on \cite{taco_format} (Section~\ref{sec:taco_format}) as well as \cite{
 %\end{figure}
 
 \subsubsection{Fibertrees}
+\label{sec:fibertrees}
 
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{figures/efficient_processing_fibertree.png}
@@ -220,7 +231,7 @@ Sparseloop\cite{sparseloop} extends Timeloop with support for Sparsity. Sparselo
 
 Nonetheless, a real design would require a microarchitectural change which implements the optimization, referred to here as the \textit{SAF microarchitecture.} Existing analytical modeling tools\cite{sparseloop} model only the benefits of exploiting SAFs (savings on memory capacity, fewer memory accesses, fewer compute cycles); these benefits are introduced in Section~\ref{background:safs}. These tools avoid modeling the costs of SAF microarchitectures by assuming (1) an ideal SAF microarchitecture which perfectly implements the SAF, and (2) a SAF microarchitecture with negligible energy and area overhead.
 
-Section~\ref{background:safs} the Sparseloop unifed SAF taxonomy. Section~\ref{background:saf_uarch} demonstrates that SAF microarchitectures can \textit{sometimes} have significant implications for the design and modeling of sparse tensor accelerators. Thus, this work is motivated by the need to create novel SAF microarchitecture models.
+Section~\ref{background:safs} introduces the Sparseloop unifed SAF taxonomy. Section~\ref{background:saf_uarch} demonstrates that SAF microarchitectures can \textit{sometimes} have significant implications for the design and modeling of sparse tensor accelerators. Thus, this work is motivated by the need to create novel SAF microarchitecture models.
 
 %
 % SAFs subsection
@@ -228,63 +239,54 @@ Section~\ref{background:safs} the Sparseloop unifed SAF taxonomy. Section~\ref{b
 \subsubsection{SAFs}
 \label{background:safs}
 
-This section will review and motivate the two broad SAF categories. Table~\ref{tab:design_specific_models} provides examples of how SAFs are used in prior research.
+This section will review and motivate the two broad SAF categories, format and action SAFs.
 
 %
 % Figure: examples of action optimizations
 %
-\begin{figure}[H]
-\includegraphics[width=\textwidth]{figures/saf_action_optimizations.PNG}
-\caption{An example of dot-product optimized with zero-gating and zero-skipping to save cycles and energy, versus the naive un-optimized approach. The zero-skipping optimization's efficacy may depend on the choice of leader-follower skipping vs bidirectional skipping.}
-\label{fig:saf_action_optimizations}
-\end{figure}
+%\begin{figure}[H]
+%\includegraphics[width=\textwidth]{figures/saf_action_optimizations.PNG}
+%\caption{An example of dot-product optimized with zero-gating and zero-skipping to save cycles and energy, versus the naive un-optimized approach. The zero-skipping optimization's efficacy may depend on the choice of leader-follower skipping vs bidirectional skipping.}
+%\label{fig:saf_action_optimizations}
+%\end{figure}
 %
 % Table: Action SAFs, comparison of perf and energy
 %
-\begin{table}[ht]
-\begin{tabular}{c|c|c|}
- & Cycles & Energy \\ \hline \hline
-Theoretical &  \textcolor{green}{\textbf{1}} & \textcolor{green}{\textbf{$E_{mac}$}}\\ \hline
-Naive &  \textcolor{red}{\textbf{5}} & \textcolor{red}{\textbf{$5 E_{mac}$}}\\ \hline
-Zero-gating &  \textcolor{red}{\textbf{5}} & \textcolor{green}{\textbf{$E_{mac}$}} \\ \hline
-Zero-skipping (leader-follower) & \textcolor{red}{\textbf{2}} & \textcolor{red}{\textbf{$2 E_{mac}$}} \\ \hline
-Zero-skipping (bidirectional) & \textcolor{green}{\textbf{1}} & \textcolor{green}{\textbf{$E_{mac}$}} \\ \hline
-\end{tabular}
-\caption{Dot-product cycles and energy with different action-optimization strategies applied to the PE in Figure \ref{fig:saf_action_optimizations}, versus the theoretical-best. Energy is measured in multiples of the energy of a single MAC, $E_{mac}$}
-\label{tab:action_saf_comparison}
-\centering
-\end{table}
+%\begin{table}[ht]
+%\begin{tabular}{c|c|c|}
+% & Cycles & Energy \\ \hline \hline
+%Theoretical &  \textcolor{green}{\textbf{1}} & \textcolor{green}{\textbf{$E_{mac}$}}\\ \hline
+%Naive &  \textcolor{red}{\textbf{5}} & \textcolor{red}{\textbf{$5 E_{mac}$}}\\ \hline
+%Zero-gating &  \textcolor{red}{\textbf{5}} & \textcolor{green}{\textbf{$E_{mac}$}} \\ \hline
+%Zero-skipping (leader-follower) & \textcolor{red}{\textbf{2}} & \textcolor{red}{\textbf{$2 E_{mac}$}} \\ \hline
+%Zero-skipping (bidirectional) & \textcolor{green}{\textbf{1}} & \textcolor{green}{\textbf{$E_{mac}$}} \\ \hline
+%\end{tabular}
+%\caption{Dot-product cycles and energy with different action-optimization strategies applied to the PE in Figure \ref{fig:saf_action_optimizations}, versus the theoretical-best. Energy is measured in multiples of the energy of a single MAC, $E_{mac}$}
+%\label{tab:action_saf_comparison}
+%\centering
+%\end{table}
 %
 % Content: SAFs
 %
-\paragraph{Action optimizations.} These are SAFs which signify that the tensor accelerator detects and optimizes away ineffectual operations such as $0 \times 0 = 0$ and $0 \times a = 0$, with the goal of saving energy and potentially compute cycles. Figure \ref{fig:saf_action_optimizations} compares action optimization cost for a dot-product problem mapped to a simple PE with two buffers and a MAC unit which consumes $E_{mac}$ per operation. Theoretically only one cycle and $E_{mac}$ energy should be required to multiply $a_0 \times b_0$; there are no other effectual MAC operations. Table \ref{tab:action_saf_comparison} shows that a "naive" PE design with no action optimization SAFs underperforms on both cycles and energy by $5\times$, and Figure \ref{fig:saf_action_optimizations} shows that the cause is ineffectual MACs being performed. \textit{Zero-gating} (or \textit{gating}) conserves $E_{mac}$ energy per ineffectual MAC since the MAC unit idles for a cycle. In other words there is no conservation of cycles for ineffectual operations, only energy. \textit{Zero-skipping} (or \textit{skipping}) conserves $E_{mac}$ per ineffectual MAC, but does so by skipping immediately to the next one - thus both energy and time are saved by skipping. 
+\paragraph{Action optimizations.} These are SAFs which signify that the tensor accelerator detects and optimizes away ineffectual operations such as $0 \times 0 = 0$ and $0 \times a = 0$, with the goal of saving energy and potentially compute cycles. Gating SAFs save on the energy associated wth IneffOps\cite{sparseloop}, by quiescing relevant components during the cycle when the operation occurs. Skipping SAFs save on energy \textit{and} cycles, by bypassing the IneffOp entirely and jumping ahead to the next operation.
 
-Designs with \textit{bidirectional action optimizations} do not perform a MAC when either operand is zero. Thus 100\% of gating or skipping opportunities are exploited, depending on the type of action optimization. Designs with \textit{leader-follower action optimizations} respond only to the designated leader operand being zero, in which case both the MAC and the follower memory access are skipped or gated.
+Designs with \textit{bidirectional action optimizations} skip or gate when either operand is zero. Thus 100\% of gating or skipping opportunities are exploited, depending on the type of action optimization. Designs with \textit{leader-follower action optimizations} respond only to the designated leader operand being zero, in which case both the MAC and the follower memory access are skipped or gated; ineffectual follower operands incur no savings.
 
-Figure~\ref{fig:saf_action_optimizations} summarizes the attributes of action optimizations. The key attribute for both skipping and gating action optimizations is direction (\textit{bidirectional} vs \textit{leader-follower}.)
+Thus, the key attribute for both skipping and gating action optimizations is direction (\textit{bidirectional} vs \textit{leader-follower}, and also the particular architectural element (buffer or arithmetic) which the SAF is bound to.
 
 %
-\paragraph{Format optimizations.} The zero-compression (or \textit{format}) SAF discards ineffectual zero-valued tensor elements in order to save memory capacity at rest and memory bandwidth during acceses. The remaining nonzero values' positions in memory no longer align with the original coordinates, so the compressed format requires metadata which may be used to recover an element's uncompressed coordinate as efficiently as possible (Figure \ref{fig:saf_format_optimizations}.) 
-
-The three representation formats studied in this work are
-
-\begin{itemize}
-    \item \textbf{Uncompressed (U)} - U represents a vector as it exists in memory without any compression, including zero-value elements. The sparse tensor architectures which we consider here, will typically eschew U in favor of a compressed format.
-    \item \textbf{Uncompressed Offset Pairs (UOP)} - UOP 
-    \item \textbf{Coordinate Payload (C)}
-    \item \textbf{Bitmask (B)}
-\end{itemize}
+\paragraph{Format optimizations.} The zero-compression (or \textit{format}) SAF discards ineffectual zero-valued tensor elements in order to save memory capacity at rest and memory bandwidth during accesses\cite{sparseloop}. The remaining nonzero values' positions in memory no longer align with the original coordinates, so the compressed format requires metadata which may be used to recover an element's uncompressed coordinate as efficiently as possible (Figure \ref{fig:saf_format_optimizations}.) 
 
 These are derived from the Sparseloop\cite{sparseloop} paper.
 
 %
 % Figure: examples of format optimizations
 %
-\begin{figure}[H]
-\includegraphics[width=8cm]{figures/saf_format_optimizations.PNG}
-\caption{A visualization of a compressed representation format (coordinate-payload or CP) applied to a vector with some zero entries. The compressed representation is reduced to nonzero values and metadata which recovers the original data structure.}
-\label{fig:saf_format_optimizations}
-\end{figure}
+%\begin{figure}[H]
+%\includegraphics[width=8cm]{figures/saf_format_optimizations.PNG}
+%\caption{A visualization of a compressed representation format (coordinate-payload or CP) applied to a vector with some zero entries. The compressed representation is reduced to nonzero values and metadata which recovers the original data structure.}
+%\label{fig:saf_format_optimizations}
+%\end{figure}
 %
 % Content: format optimizations
 %
@@ -292,20 +294,20 @@ These are derived from the Sparseloop\cite{sparseloop} paper.
 %
 % Figure: combined action/format optimizations
 %
-\begin{figure}[H]
-\includegraphics[width=4cm]{figures/saf_action_format_combo.PNG}
-\caption{An example of dot-product optimized with both bidirectional zero-skipping and a compressed representation format. Conceptually corresponding nonzero values must be matched using a component which processes format metadata in order to implement skipping, which is called an \textit{intersection unit.} The cost of the skipping optimization is the energy, area and latency of the skipping microarchitecture, which comprises the intersection unit.}
-\label{fig:saf_action_format_combo}
-\centering
-\end{figure}
+%\begin{figure}[H]
+%\includegraphics[width=4cm]{figures/saf_action_format_combo.PNG}
+%\caption{An example of dot-product optimized with both bidirectional zero-skipping and a compressed representation format. Conceptually corresponding nonzero values must be matched using a component which processes format metadata in order to implement skipping, which is called an \textit{intersection unit.} The cost of the skipping optimization is the energy, area and latency of the skipping microarchitecture, which comprises the intersection unit.}
+%\label{fig:saf_action_format_combo}
+%\centering
+%\end{figure}
 
-\subsubsection{Sparseloop workflow}
+%\subsubsection{Sparseloop workflow}
 
-\begin{figure}[H]
-\includegraphics[width=8cm]{figures/sparseloop_workflow.png}
-\caption{The Sparseloop workflow for architectural modeling and design-space exploration, simplified.}
-\label{fig:sparseloop_workflow}
-\end{figure}
+%\begin{figure}[H]
+%\includegraphics[width=8cm]{figures/sparseloop_workflow.png}
+%\caption{The Sparseloop workflow for architectural modeling and %design-space exploration, simplified.}
+%\label{fig:sparseloop_workflow}
+%\end{figure}
 
 \section{SAF microarchitectures}
 \label{background:saf_uarch}
@@ -329,46 +331,46 @@ As a final example, the GAMMA\cite{gamma} accelerator PE devotes 30\% of its PE 
 
 Clearly, SAFs and SAF microarchitecture designs are complex and impactful design decisions, and it is desirable to know whether a particular combination of SAFs will lead to the substantial PE implementation overhead seen (for example) in SparTen and GAMMA. The rest of this work develops a conceptual framework for taxonomy and modeling of SAF microarchitectures. This conceptual framework can be represented in software and utilized to make SAF microarchitecture design decisions using analytical pre-RTL modeling tools.
 
-\subsection{Existing SAF microarchitecture designs}
-
-\begin{table}[h]
-\centering
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{||l|l|l|l|l|l||}
-\hline
-\hline
-\textbf{Design} & \textbf{Workload} & \textbf{Sparse formats} & \textbf{Action SAFs} & \textbf{$\mu$arch primitives} \\
-\hline
-\hline
-Eyeriss\cite{eyeriss} & DNN\cite{eyeriss}\cite{sparseloop} & \parbox[t]{5cm}{\cite{eyeriss}\cite{sparseloop}: \\ offchip: \\ - I/O: B-RLE \\ - W:U \\ onchip: \\ - I: UB \\ - O/W:U} & \parbox[t]{5cm}{\cite{eyeriss}\cite{sparseloop}: \\ Innermost storage: \\ - Gate W $<$- I \\ - Gate O $<$- I} & RLE (de)comp.\cite{eyeriss} \\
-\hline
-SparTen\cite{sparten} & DNN\cite{sparten} & - B (PE)\cite{sparten} & Skip (BD) (PE)\cite{sparten} & \parbox[t]{5cm}{\cite{sparten}: \\ B isect. \\ Pref.-sum (B$->$pos) \\ Pri.-enc. (compaction)} \\
-\hline
-Eyeriss v2\cite{eyerissv2} & DNN\cite{sparseloop}\cite{eyerissv2} & \parbox[t]{5cm}{\cite{eyerissv2}\cite{sparseloop}: \\ - I/W: B-UOP-CP (B-CSC) \\ - O:U} & \parbox[t]{5cm}{\cite{eyerissv2}: \\ Innermost storage: \\ - Skip W $<$- I \\ - Skip O $<$- I \& W \\ - Gate Compute} & \\
-\hline
-Cambricon-X\cite{cambricon_x} & DNN\cite{cambricon_x} & & & \\
-\hline
-Cnvlutin\cite{cnvlutin} & DNN\cite{cnvlutin} & & & \\
-\hline
-EIE\cite{eie} & DNN\cite{eie} & & & \\
-\hline
-ExTensor\cite{extensor} & MM\cite{extensor}\cite{sparseloop} & \parbox[t]{5cm}{\cite{extensor} \\ - A/B: UOP-CPx5 \\ - Z: U} & \parbox[t]{5cm}{All Storage: \\ - Skip A$<->$B \\ - Skip Z$<->$A\&B} & - C isect. \\
-\hline
-MatRaptor\cite{matraptor} & MM\cite{matraptor}\cite{teaal} & - C$^2$SR\cite{matraptor} & Skip B $<$- A & Psum. merge \\
-\hline
-SIGMA\cite{sigma} & MM\cite{sigma}\cite{teaal} & \parbox[t]{5cm}{B} & & \\
-\hline
-SpArch\cite{sparch} & MM\cite{sparch}\cite{teaal} & & & Parallel merge\cite{sparch} \\
-\hline
-Tensaurus\cite{tensaurus} & Some einsums\cite{tensaurus}\cite{teaal} & & & \\
-\hline
-GAMMA\cite{gamma} & MM\cite{gamma}\cite{teaal} & \parbox[t]{5cm}{\cite{gamma}: \\ - A: CSR \\ - B: CSR}  & \parbox[t]{5cm}{Skip B $<$- A} & \parbox[t]{5cm}{- Transp. merge-and-sum \\ - Fiber fetcher \\ - Leader val. LUT \\ } \\
-\hline
-\hline
-\end{tabular}%
-}
-\caption{Summary of Designs}
-\end{table}
+%\subsection{Existing SAF microarchitecture designs}
+%
+%\begin{table}[h]
+%\centering
+%\resizebox{\textwidth}{!}{%
+%\begin{tabular}{||l|l|l|l|l|l||}
+%\hline
+%\hline
+%\textbf{Design} & \textbf{Workload} & \textbf{Sparse formats} & %\textbf{Action SAFs} & \textbf{$\mu$arch primitives} \\
+%\hline
+%\hline
+%Eyeriss\cite{eyeriss} & DNN\cite{eyeriss}\cite{sparseloop} & \parbox[t]{5cm}{\cite{eyeriss}\cite{sparseloop}: \\ offchip: \\ - I/O: B-RLE \\ - W:U \\ onchip: \\ - I: UB \\ - O/W:U} & \parbox[t]{5cm}{\cite{eyeriss}\cite{sparseloop}: \\ Innermost storage: \\ - Gate W $<$- I \\ - Gate O $<$- I} & RLE (de)comp.\cite{eyeriss} \\
+%\hline
+%SparTen\cite{sparten} & DNN\cite{sparten} & - B (PE)\cite{sparten} & Skip (BD) (PE)\cite{sparten} & \parbox[t]{5cm}{\cite{sparten}: \\ B isect. \\ Pref.-sum (B$->$pos) \\ Pri.-enc. (compaction)} \\
+%\hline
+%Eyeriss v2\cite{eyerissv2} & DNN\cite{sparseloop}\cite{eyerissv2} & \parbox[t]{5cm}{\cite{eyerissv2}\cite{sparseloop}: \\ - I/W: B-UOP-CP (B-CSC) \\ - O:U} & \parbox[t]{5cm}{\cite{eyerissv2}: \\ Innermost storage: \\ - Skip W $<$- I \\ - Skip O $<$- I \& W \\ - Gate Compute} & \\
+%\hline
+%Cambricon-X\cite{cambricon_x} & DNN\cite{cambricon_x} & & & \\
+%\hline
+%Cnvlutin\cite{cnvlutin} & DNN\cite{cnvlutin} & & & \\
+%\hline
+%EIE\cite{eie} & DNN\cite{eie} & & & \\
+%\hline
+%ExTensor\cite{extensor} & MM\cite{extensor}\cite{sparseloop} & \parbox[t]{5cm}{\cite{extensor} \\ - A/B: UOP-CPx5 \\ - Z: U} & \parbox[t]{5cm}{All Storage: \\ - Skip A$<->$B \\ - Skip Z$<->$A\&B} & - C isect. \\
+%\hline
+%MatRaptor\cite{matraptor} & MM\cite{matraptor}\cite{teaal} & - C$^2$SR\cite{matraptor} & Skip B $<$- A & Psum. merge \\
+%\hline
+%SIGMA\cite{sigma} & MM\cite{sigma}\cite{teaal} & \parbox[t]{5cm}{B} & & \\
+%\hline
+%SpArch\cite{sparch} & MM\cite{sparch}\cite{teaal} & & & Parallel merge\cite{sparch} \\
+%\hline
+%Tensaurus\cite{tensaurus} & Some einsums\cite{tensaurus}\cite{teaal} & & & \\
+%\hline
+%GAMMA\cite{gamma} & MM\cite{gamma}\cite{teaal} & \parbox[t]{5cm}{\cite{gamma}: \\ - A: CSR \\ - B: CSR}  & \parbox[t]{5cm}{Skip B $<$- A} & \parbox[t]{5cm}{- Transp. merge-and-sum \\ - Fiber fetcher \\ - Leader val. LUT \\ } \\
+%\hline
+%\hline
+%\end{tabular}%
+%}
+%\caption{Summary of Designs}
+%\end{table}
 
 %\begin{table}[h]
 %\centering

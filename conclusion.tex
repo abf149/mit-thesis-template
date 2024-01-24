@@ -1,2 +1,26 @@
 \chapter{Conclusion}
 \label{chapter:conclusion}
+
+A SAF microarchitecture taxonomy was developed and scoped to include format- and skipping- related SAF microarchitectures. A system for inferring low-level scale parameters and automatically sizing SAF microarchitecture components to satisfy workload requirements was also developed.
+
+A library of RTL components was developed and characterized as a basis for creating analytical models of SAF microarchitecture primitives. These RTL models also serve as reference designs.
+
+The SAFTools framework was developed to facilitate the end-to-end process of transforming declarative sparsity optimization specifications (in Sparseloop\cite{sparseloop} format) into SAF microarchitectures, and sizing SAF microarchitecture primitive components to satisfy inferred workload requirements.
+
+A machine-learning method for modeling coordinate-payload bidirectional intersection unit transfer relations was developed, applied, and validated.
+
+A potentially-novel intersection unit variety, Direct-mapped intersection unique, was implemented in RTL, characterized, and modeled against other intersection unit varieties. Tentatively, it appears that direct-mapped intersection units may outperform other intersection unit varieties at serving high match throughput in SIMD arithmetic architectures while keeping energy and area low. 
+
+Future work should focus on (1) more in-depth validation of the whole work, (2) refinement of the models, and (3) further experimentation in order to confirm claims about direct-mapped intersection unit. Specific approaches to refining the models could include
+
+\begin{itemize}
+    \item Employing layout-level simulation to increase accuracy and capture more subtle overheads such as those resulting from wiring
+    \item Differentiating between models of RTL which exploits pipelining, versus RTL which exploits combinational unrolling
+    \item Providing options to use different types of pipelining
+\end{itemize}
+
+It would be good to see validation and case studies which use Sparseloop alongside SAFTools to inform whole-design decisions.
+
+Note that the full depth of modeling work which was done, was not validated. For example, the impact of clock period on energy and area was considered during characterization, but for brevity was not incorporated into the validation or case-studies.
+
+If the relative benefit of utilizing direct-mapped intersection is supported by future work, this suggests that hashmap-based intersection units suggested in the ExTensor\cite{extensor} are also worth exploring.
