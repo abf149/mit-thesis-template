@@ -26,6 +26,7 @@ This work builds on prior efforts to build conceptual frameworks around sparse t
 Building on the TACO tensor algebra compiler\cite{taco}, a unified abstraction for representing diverse sparse tensor representation formats was developed in \cite{taco_format} with the goal of providing general sparsity support in TACO\cite{taco}. Figure~\ref{fig:taco_format_example} illustrates the two of the many \textit{level format} data structures from \cite{taco_format}.
 
 \begin{figure}[H]
+\centering
 \includegraphics[width=0.5\textwidth]{figures/taco_levels.png}
 \caption{A subset\cite{taco_format} of TACO\cite{taco} sparse \textit{level formats.}}
 \label{fig:taco_levels}
@@ -275,7 +276,7 @@ Designs with \textit{bidirectional action optimizations} skip or gate when eithe
 Thus, the key attribute for both skipping and gating action optimizations is direction (\textit{bidirectional} vs \textit{leader-follower}, and also the particular architectural element (buffer or arithmetic) which the SAF is bound to.
 
 %
-\paragraph{Format optimizations.} The zero-compression (or \textit{format}) SAF discards ineffectual zero-valued tensor elements in order to save memory capacity at rest and memory bandwidth during accesses\cite{sparseloop}. The remaining nonzero values' positions in memory no longer align with the original coordinates, so the compressed format requires metadata which may be used to recover an element's uncompressed coordinate as efficiently as possible (Figure \ref{fig:saf_format_optimizations}.) 
+\paragraph{Format optimizations.} The zero-compression (or \textit{format}) SAF discards ineffectual zero-valued tensor elements in order to save memory capacity at rest and memory bandwidth during accesses\cite{sparseloop}. The remaining nonzero values' positions in memory no longer align with the original coordinates, so the compressed format requires metadata which may be used to recover an element's uncompressed coordinate as efficiently as possible.
 
 These are derived from the Sparseloop\cite{sparseloop} paper.
 
