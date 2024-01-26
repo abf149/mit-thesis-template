@@ -15,9 +15,16 @@ This case-study explores the tradeoff of different skipping microarchitectures i
 
 SAFmodel was also used to generate Accelergy analytical models for use with Sparseloop; however, for a variety of reasons, these models were not integrated into a Sparseloop testbench; the tradeoff study here only compares the energy-per-action and area overhead of SAF microarchitectures but does not use Sparseloop to obtain action counts or get energy/area estimates for the rest of the architecture.
 
-More specifically, this case-study compares the SAF microarchitectures based on energy-per-action/area product, with the goal of optimizing energy and area simultaneously. 
+SAFTools allows the user to customize the objective function for optimizing SAF microarchitecture. In this work, the objective function is the total energy-per-action/area product, over all SAF microarchitecture primitives and all actions. This is the default SAFTools objective function, and it is chosen in order to co-optimize energy and area. 
 
-For taxonomic inference, SAFinfer was provided Sparseloop configuration files specifying a hypothetical architecture with a buffer holding both input operands resident, both in CSR format (T-<UC>), and subject to a bidirectional skipping SAF; additionally there is a single partial sum register for accumulating the inner product in a dense/uncompressed format.
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/case_study_declarative.pdf}
+\caption{Sparseloop configuration files provided to SAFinfer.}
+\label{fig:case_study_declarative}
+\end{figure}
+
+For taxonomic inference, SAFinfer was provided Sparseloop configuration files specifying a hypothetical architecture with a buffer holding both input operands resident, both in CSR format (T-<UC>(MK) and T-<UC>(NK) respectively), and subject to a bidirectional skipping SAF. This state of affairs is summarized in Figure~\ref{fig:case_study_declarative}. This Sparseloop configuration file is meant to represent spGEMM without tiling\footnote{SAFinfer only consumes the Sparseloop architecture and Sparseopts files; SAFinfer does not have access to the problem einsum or mapping\cite{sparseloop}.} Additionally there is a single partial sum register for accumulating the inner product in a dense/uncompressed format.
 
 For scale inference, SAFmodel was provided the SAFinfer output microarchitecture as well as a requirement to use energy-per-action/area product as the objective function to minimize during scale inference. SAFmodel was instrumented to output a sweep over valid scale parameter configurations $\{S_x\}_{valid}$, for the purposes of visualizing and comparing possible combinations of low-level scale parameters such as input vectorization, pipeline depth, etc.
 
@@ -65,13 +72,11 @@ Figures~\ref{fig:skip_uarch_pipe_2} and~\ref{fig:skip_uarch_pipe_5} compare the 
 
 Note that the relationship between max throughput and sparsity is derived from the transfer relation model that was developed in Section~\ref{sec:c_c_isect_modeling}.
 
-It is clear that pipelining is key to supporting high-throughput intersection, which in turn is critical in a SIMD scenario. It is worth noting that in the scenario shown (vectorization 4, rank size 16), non of these intersection units could supply 2 matches/cycle to support a SIMD 2 arithmetic unit; the max is 1.6 matches/cycle regardless of pipelining. 
+It is clear that pipelining is key to supporting high-throughput intersection, which in turn is critical in a SIMD scenario. It is worth noting that in the scenario shown (vectorization 4, rank size 16), none of these intersection units could supply 2 matches/cycle to support a SIMD 2 arithmetic unit; the max is 1.6 matches/cycle regardless of pipelining. More detailed analysis of the peak matches/cycle throughput supported by each intersection unit variety is provided in Appendix~\ref{appendix:app_intersection_modeling}.
 
-In Figure~\ref{fig:skip_uarch_pipe_2}, direct-mapped intersection attains the highest throughput, followed by skip-ahead intersection unit; this makes sense since direct-mapped intersection has 100\% pipeline efficiency and skip-ahead intersection unit has optimizations to increase pipeline efficiency. This also shows that with 2 pipeline stages, the intersection unit is \textit{efficiency-limited} i.e. limited by how efficient the choice of intersection unit is.
+In Figure~\ref{fig:skip_uarch_pipe_2}, direct-mapped intersection attains the highest throughput, followed by skip-ahead intersection unit; this makes sense since direct-mapped intersection has 100\% pipeline efficiency and skip-ahead intersection unit has optimizations to increase pipeline efficiency. This also shows that with 2 pipeline stages, the intersection unit is \textit{efficiency-limited} i.e. limited by how efficient the choice of intersection unit is when it comes to maximizing the number of matches found by a pipeline stage per cycle.
 
 In contrast, in Figure~\ref{fig:skip_uarch_pipe_5}, all intersection units are capable of attaining the same throughput with 5 pipeline stages; this shows that with enough pipeline stages, the intersection unit is \textit{input-rate-limited}, i.e. it is not possible to output more intersections per cycle without changing fiber sparsity, dense rank size, or input vectorization of the intersection unit. Being input-rate-limited is broadly speaking a ``good'' thing, since it means that the particular type of intersection unit we chose is not slowing down the design. We can further observe that while two-finger and skip-ahead intersection unit required multiple pipeline stages in order to be input-rate-limited, direct-mapped intersection unit is already input-rate-limited in Figure~\ref{fig:skip_uarch_pipe_2}. This is because by design, direct-mapped intersection finds all matches in a single cycle, and thus requires only one pipeline stage.
-
-Note that it may be possible for the intersection units to support SIMD 2 arithmetic  with i.e. a different choice of vectorization; for brevity this was not explored further.
 
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{figures/skip_uarch_sparsity_30pct.png}
@@ -102,6 +107,6 @@ These results suggest that in a SIMD 2 arithmetic scenario, the direct-mapped in
 \end{itemize}
 
 
-Note that in this case study, we are considering intersection units with vector pipelines; however, the energy-per-action and area characterization results used here are based on \textit{combinational unrolling} rather than \textit{pipelining}; this means that energy-per-action/area product values quoted in this section may be over-estimates for intersection units with more than one pipeline stage. This could explain the apparent non-linear scaling of two-finger intersection in Figures~\ref{fig:skip_uarch_sparsity_30pct},~\ref{fig:skip_uarch_sparsity_50pct}, and~\ref{fig:skip_uarch_sparsity_70pct}, as combinationally unrolling has non-linear overheads. 
+Note that in this case study, we are considering intersection units with vector pipelines; however, owing to an early decision to design microarchitecture models based on \textit{combinational unrolling} (Section~\ref{rtl}), the energy-per-action and area characterization results used here are based on combinational unrolling rather than \textit{pipelining}; this means that energy-per-action/area product values quoted in this section may be over-estimates for intersection units with more than one pipeline stage. This could explain the apparent non-linear scaling of two-finger intersection in Figures~\ref{fig:skip_uarch_sparsity_30pct},~\ref{fig:skip_uarch_sparsity_50pct}, and~\ref{fig:skip_uarch_sparsity_70pct}, as combinationally unrolling has non-linear overheads. 
 
 However, it is likely that using energy-per-action and area characterization results based on pipelining, would not significantly change the outcome, because direct-mapped intersection would still have the best pipeline efficiency. Re-running these experiments with models based on pipelining, rather than combinational unrolling, is left for future work.

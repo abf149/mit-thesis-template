@@ -109,9 +109,9 @@ The bidirectional coordinate-payload skipping microarchitecture has one free par
 
 The bidirectional bitmask skipping microarchitecture has two free parameters, $S_{pgen2src}$ and $S_{pgen2ref}$:
 
-\[ S_{pgen2src} \in (log\_depth\_prefix\_sum , ripple\_prefix\_sum) \]
+\[ S_{pgen2ref} \in (log\_depth\_prefix\_sum , ripple\_prefix\_sum) \]
 
-\[ S_{pgen2ref} \in (log\_depth\_priority\_encoder) \]
+\[ S_{pgen2src} \in (log\_depth\_priority\_encoder) \]
 
 \begin{figure}[H]
     \centering
@@ -129,7 +129,7 @@ The bidirectional bitmask skipping microarchitecture has two free parameters, $S
 
 Figures~\ref{fig:SKIP_C_U_leader_follower_yes_opt_fills} and~\ref{fig:SKIP_C_U_leader_follower_no_opt_fills} compare coordinate-payload leader-follower skipping microarchitectures, with and without fill optimization. The variant with fill optimization has one free parameter, $S_{fopt}$:
 
-\[S_{fopt} \in (pipeline\_bubble\_skip,lut\_skip)\]
+\[S_{fopt} \in (pipeline\_bubble\_gate,lut\_skip)\]
 
 These are the choices of the fill optimizer \textit{strategy} attribute, which is discussed in Section~\ref{chapter:primitive_taxo_model}.
 

@@ -9,18 +9,18 @@ The SAFTools framework was developed to facilitate the end-to-end process of tra
 
 A machine-learning method for modeling coordinate-payload bidirectional intersection unit transfer relations was developed, applied, and validated.
 
-A potentially-novel intersection unit variety, Direct-mapped intersection unique, was implemented in RTL, characterized, and modeled against other intersection unit varieties. Tentatively, it appears that direct-mapped intersection units may outperform other intersection unit varieties at serving high match throughput in SIMD arithmetic architectures while keeping energy and area low. 
+A potentially novel intersection unit variety, the direct-mapped intersection unit, was implemented in RTL, characterized, and modeled against other intersection unit varieties. Tentatively, it appears that direct-mapped intersection units may outperform other intersection unit varieties at serving high match throughput in SIMD arithmetic architectures while keeping energy and area low. However, affirming this result is contingent on further refinement of the SAF microarchitecture models developed in this work.
 
 Future work should focus on (1) more in-depth validation of the whole work, (2) refinement of the models, and (3) further experimentation in order to confirm claims about direct-mapped intersection unit. Specific approaches to refining the models could include
 
 \begin{itemize}
     \item Employing layout-level simulation to increase accuracy and capture more subtle overheads such as those resulting from wiring
-    \item Differentiating between models of RTL which exploits pipelining, versus RTL which exploits combinational unrolling
-    \item Providing options to use different types of pipelining
+    \item Where appropriate, implement vector-pipelined \textit{and} combinationall-unrolled variants of each model
+    \item Providing options to use different types of pipelining; ensure that all models in a given experiment are configured to use the same form of pipelining.
 \end{itemize}
 
 It would be good to see validation and case studies which use Sparseloop alongside SAFTools to inform whole-design decisions.
 
 Note that the full depth of modeling work which was done, was not validated. For example, the impact of clock period on energy and area was considered during characterization, but for brevity was not incorporated into the validation or case-studies.
 
-If the relative benefit of utilizing direct-mapped intersection is supported by future work, this suggests that hashmap-based intersection units suggested in the ExTensor\cite{extensor} are also worth exploring.
+If the relative benefit of utilizing direct-mapped intersection is supported by future work, this suggests that hashmap-based intersection units suggested in the ExTensor\cite{extensor} are also worth exploring: direct-mapped intersection units are essentially a special case of hashmap-based intersection units, in which the hashmap is the size of the dense rank.

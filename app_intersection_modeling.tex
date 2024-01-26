@@ -44,7 +44,8 @@
 \newpage
 
 \begin{figure}[H]
-\includegraphics[width=0.75\textwidth]{figures/expected_cycles_F8.png}
+\centering
+\includegraphics[width=0.6\textwidth]{figures/expected_cycles_F8.png}
 \caption{Average cycles-per-intersection when applying a $\{1,2,4\}$-way vectorized intersection unit to intersect two length-8 vectors. Naive two-fingered merge, skip-ahead, and direct-mapped intersection units are compared.}
 \label{fig:expected_cycles_F8}
 \end{figure}
@@ -52,7 +53,8 @@
 \newpage
 
 \begin{figure}[H]
-\includegraphics[width=0.75\textwidth]{figures/expected_cycles_F16.png}
+\centering
+\includegraphics[width=0.6\textwidth]{figures/expected_cycles_F16.png}
 \caption{Average cycles-per-intersection when applying a $\{1,2,4\}$-way vectorized intersection unit to intersect two length-16 vectors. Naive two-fingered merge, skip-ahead, and direct-mapped intersection units are compared.}
 \label{fig:expected_cycles_F16}
 \end{figure}
@@ -60,7 +62,8 @@
 \newpage
 
 \begin{figure}[H]
-\includegraphics[width=0.75\textwidth]{figures/expected_cycles_F32.png}
+\centering
+\includegraphics[width=0.6\textwidth]{figures/expected_cycles_F32.png}
 \caption{Average cycles-per-intersection when applying a $\{1,2,4\}$-way vectorized intersection unit to intersect two length-32 vectors. Naive two-fingered merge, skip-ahead, and direct-mapped intersection units are compared.}
 \label{fig:expected_cycles_F32}
 \end{figure}
@@ -69,9 +72,11 @@
 
 \section{Detailed comparison of match throughput as a function of sparsity (geomean) for several varieties of intersection unit, several fiber size values, and several unique degrees of input vectorization.}
 
+\clearpage
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/isect_model_fl8_vl1.pdf}
+    \includegraphics[width=0.6\textwidth]{figures/isect_model_fl8_vl1.pdf}
     \caption{Comparison of match throughput with respect to sparsity (geomean) for fiber size 8 and input vectorization degrees 1, 2 and 4.}
     \label{fig:isect_model_fl8_vl1}
 \end{figure}
@@ -80,7 +85,7 @@
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/isect_model_fl16_vl1.pdf}
+    \includegraphics[width=0.6\textwidth]{figures/isect_model_fl16_vl1.pdf}
     \caption{Comparison of match throughput with respect to sparsity (geomean) for fiber size 16 and vectorization degrees 1, 2 and 4.}
     \label{fig:isect_model_fl16_vl1}
 \end{figure}
@@ -89,7 +94,7 @@
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/isect_model_fl32_vl1.pdf}
+    \includegraphics[width=0.6\textwidth]{figures/isect_model_fl32_vl1.pdf}
     \caption{Comparison of match throughput with respect to sparsity (geomean) for fiber size 32 and input vectorization degrees 1, 2 and 4.}
     \label{fig:isect_model_fl32_vl1}
 \end{figure}

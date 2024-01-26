@@ -16,7 +16,7 @@ Two YAML frameworks were developed for this work. \textit{Taxoscript} was develo
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.5\textwidth]{figures/saftools_overview.pdf}
+\includegraphics[width=0.95\textwidth]{figures/saftools_overview.pdf}
 \caption{An overview of the SAFTools software suite.}
 \label{fig:saftools_overview}
 \end{figure}
@@ -53,7 +53,7 @@ After performing scale inference, SAFmodel exports Accelergy models for the opti
 
 Recall that the output of SAFinfer is a netlist of SAF microarchitecture components. This netlist is hierarchical; the top level is the netlist connecting high-level SAF microarchitecture blocks (FMT, SKIP) to ``stubs'' which stand in for architectural buffers, and the bottom level is a netlist within each high-level block, which specifies the connectivity between primitives in the implementation topology.
 
-SAFmodel first flattens this netlist, so that it contains only SAF microarchitecture primitives. Next, SAFmodel implements the process of scale inference described in Section~\ref{chapter:modeling}: SAFmodel employes (1) workload boundary conditions and (2) primitive transfer relations, in order to infer the workload requirements imposed on each SAF microarchitecture primitive component.
+SAFmodel first flattens this netlist, so that it contains only SAF microarchitecture primitives. Next, SAFmodel implements the process of scale inference described in Section~\ref{chapter:modeling}: SAFmodel employs (1) workload boundary conditions and (2) primitive transfer relations, in order to infer the workload requirements imposed on each SAF microarchitecture primitive component.
 
 This process yields a mixed-integer non-linear program (MINLP). SAFmodel attempts to solve this MINLP and minimize the total energy-per-action/area product of all primitive models, by tuning the scale parameters of all SAF microarchitecture primitives within the design. This optimization process is constrained; the feasible region is bounded by the primitives' interface constraints, and by the workload boundary conditions.
 

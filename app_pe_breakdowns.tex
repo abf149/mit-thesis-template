@@ -14,10 +14,10 @@ The GAMMA\cite{gamma} paper quotes the breakdown of PE area shown in Table~\ref{
 \begin{center}
 \begin{tabular}{||l|l|l||}\hline
 \textbf{PE subcomponent(s)} & \textbf{PE Area} \%  & \textbf{Categorization based on this work}  \\\hline
-Merger	   & 30\% & \textbf{SAF microarchitecture} \\\hline
-FP Mul	   & 5.2\% & Architectural compute \\\hline
-FP Add	   & 9.4\% & Architectural compute \\\hline
-Others	   & 11.1\% & Architectural or non-SAF $\mu$arch \\\hline
+Merger	   & 30\% & \textbf{SAF $\mu$arch} \\\hline
+FP Mul	   & 55\% & Architectural compute \\\hline
+FP Add	   & 10\% & Architectural compute \\\hline
+Others	   & 5\% & Architectural or non-SAF $\mu$arch \\\hline
 \textbf{Total}	   & 100\% & \\\hline
 \end{tabular}
 \end{center}
@@ -27,9 +27,8 @@ Note the lack of an explicit category for PE local memory in the breakdown of Ta
 
 \begin{itemize}
     \item \textbf{SAF microarchitecture:} 30\%, includes merger
-    \item \textbf{Compute:} 14.6\%, includes FP Mul and FP Add
-    \item \textbf{On-chip memory:} 0\%
-    \item \textbf{Other:} 11.1\%
+    \item \textbf{Compute:} 65\%, includes FP Mul and FP Add
+    \item \textbf{Other:} 5\%, may or may not include on-chip memory
 \end{itemize}
 
 which is the breakdown shown in Figure~\ref{fig:saf_uarch_significance}.
@@ -44,20 +43,20 @@ Although the rank-swap itself is not a sparse optimization, nonetheless the need
 
 \section{SparTen\cite{sparten}}
 
-The SparTen paper provides the following breakdown of design area:
+The SparTen paper provides the breakdown of design area shown in Table~\ref{tab:sparten_pe_breakdown}.
 
-\begin{table}
+\begin{table}[H]
 \caption{SparTen PE area breakdown (Tab. 4 from \cite{sparten})}
 \label{tab:sparten_pe_breakdown}
 \begin{center}
 \begin{tabular}{||l|l|l||}\hline
 \textbf{PE subcomponent(s)} & \textbf{PE Area ($mm^2$)}  & \textbf{Categorization based on this work}  \\\hline
 Buffers	   & 0.1 & Architectural memory \\\hline
-Prefix-sum	   & 0.418 & \textbf{SAF microarchitecture} \\\hline
-Priority Encoder	   & 0.0626 & \textbf{SAF microarchitecture} \\\hline
+Prefix-sum	   & 0.418 & \textbf{SAF $\mu$arch} \\\hline
+Priority Encoder	   & 0.0626 & \textbf{SAF $\mu$arch} \\\hline
 MACs	   & 0.0432 & Architectural compute \\\hline
-Permute network	   & 0.0344 & \textbf{SAF microarchitecture} \\\hline
-Other	   & 0.1 & Architectural or non-SAF microarchitecture \\\hline
+Permute network	   & 0.0344 & \textbf{SAF $\mu$arch} \\\hline
+Other	   & 0.1 & Architectural or non-SAF $\mu$arch \\\hline
 \textbf{Total}	   & 0.766 & \\\hline
 \end{tabular}
 \end{center}
