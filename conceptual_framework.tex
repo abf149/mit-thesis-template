@@ -5,8 +5,10 @@ The \textit{Efficient Processing} framework presents a consistent set of abstrac
 
 \begin{itemize}
     \item The components in the \textit{Efficient Processing} SAF microarchitecture taxonomy are black boxes without any associated models of area, actions, or energy. This makes evaluation or comparison of design choices more time-consuming because models must be designed from scratch.
-    \item Among the \textit{Efficient Processing} primitives there is wide variation in complexity. Intersection units, position generators, and coordinate generators, for example, are relatively simple components. In contrast, the \textit{Efficient Processing} taxonomy also includes (for example) a number of different types of memories - in practice, memories may vary wildly in terms of i.e. what type of memory is employed (SRAM, DRAM, register file, etc.), how data orchestration is handled, what special features are supported (i.e. error correction), etc. Additionally, because the \textit{Efficient Processing} strives to show that sparse dataflows may be conceptually mapped to dataflow microarchitectures, microarchitecture designs created using the \textit{Efficient Processing} taxonomy are relatively complex.
-    \item While it is helpful to have a consistent set of SAF microarchitecture abstractions that are decoupled from the fine details of manipulating sparse representation formats, this means that the co-design process will eventually run up against the difficulty of going from a high-level SAF microarchitecture topology built out of \textit{Efficient Processing} primitives, to a more fleshed-out design that is compatible with the sparse representation formats used to compress the operands.
+    \item Among the \textit{Efficient Processing} primitives there is wide variation in complexity. Intersection units, position generators, and coordinate generators, for example, are relatively simple components. In contrast, the \textit{Efficient Processing} taxonomy also includes a number of different types of memories. In practice, memories may vary wildly in terms of i.e. what type of memory is employed (SRAM, DRAM, register file, etc.), how data orchestration is handled, what special features are supported (i.e. error correction), etc. 
+    \item Additionally, because \textit{Efficient Processing} strives to show that sparse dataflows may be conceptually mapped to dataflow microarchitectures\cite{szebook}, microarchitecture designs created using the \textit{Efficient Processing} taxonomy can be complex. For example, a number of dataflow microarchitectures shown in \textit{Efficient Processing} attempt to illustrate how memory hierarchy (buffers), data orchestration (i.e. position and coordinate generators), and specialized SAF microarchitectures (i.e. intersection units) interplay to implement a sparse kernel\cite{szebook}. This creates a need to co-design all of these aspects simultaneously, which could be overwhelming or involve a large design-space.
+    
+    \item While it is helpful to have a consistent set of SAF microarchitecture abstractions that are decoupled from the fine details of manipulating particular sparse representation formats, this means that the co-design process will eventually run up against the difficulty of going from a high-level SAF microarchitecture topology built out of \textit{Efficient Processing} primitives, to a more fleshed-out implementation that is co-designed with the sparse representation format(s) of the operands
     
 \end{itemize}
 
@@ -14,7 +16,7 @@ Building on the \textit{Efficient Processing} SAF microarchitecture topology, th
 
 \begin{itemize}
     \item Shrink the SAF microarchitecture design-space, by decoupling SAF microarchitecture from architecture and dataflow.
-    \item Augment \textit{Efficient Processing} microarchitecture primitives with \textit{parameterization} and \textit{composition}. While the existing \textit{Efficient Processing} taxonomy is good for describing a \textit{format-agnostic} SAF microarchitecture, parameterization and composition will enable a systematic process for deriving an elaborated SAF microarchitecture that is \textit{co-designed} for dataflow and sparse representation format.
+    \item Augment \textit{Efficient Processing} microarchitecture primitives with \textit{parameterization} and \textit{composition}. While the existing \textit{Efficient Processing} taxonomy is good for describing a \textit{format-agnostic} SAF microarchitecture, parameterization and composition will enable a systematic process for transforming a format-agnostic SAF microarchitecture description into an elaborated SAF microarchitecture that is \textit{co-designed} for dataflow and sparse representation format.
     \item Associate each SAF microarchitecture primitive with an analytical cost model, enabling evaluation and comparison between designs.
 \end{itemize}
 
@@ -38,7 +40,7 @@ Building on the \textit{Efficient Processing} SAF microarchitecture topology, th
 % - => Taxo of parameterized primitives & models
 % - => 
 
-Starting from these principles, this section shows builds up a conceptual framework based on these three strategies, making sure to integrate insights from prior work on sparse tensor accelerators.
+Starting from these principles, this section shows builds up a conceptual framework for studying SAF microarchitectures.
 
 \section{Decouple SAF microarchitecture from architecture and dataflow}
 \label{sec:what_is_a_saf_microarchitecture}
@@ -55,7 +57,8 @@ What is \textit{not} a SAF microarchitecture:
 \begin{itemize}
     \item Any architectural component - buffer, compute, etc. - is not SAF microarchitecture.
     \item Any microarchitecture which is not unique to sparse tensor accelerators, is not SAF microarchitecture (i.e. the microarchitectural details of switches within a NoC, unless there are \textit{specific optimizations for network routing in the presence of sparsity}, do not comprise SAF microarchitecture)
-    \item In this work \textit{dataflow} is conceived of as something that architecture \textit{does}; since architecture is excluded from SAF microarchitecture, any logic which implements dataflow is by default not SAF microarchitecture. This excludes, for example, most address generators or sequence generators, such as the \textit{Efficient Processing} position generator and coordinate generator components. However, microarchitectures which implement dataflow \textit{in a specific fashion to account for sparsity}, would count as SAF microarchitecture.
+    \item In this work \textit{dataflow} is conceived of as something that architecture \textit{does}; since architecture is excluded from SAF microarchitecture, any logic which implements dataflow is by default not SAF microarchitecture. This excludes, for example, most address generators or sequence generators, such as the \textit{Efficient Processing} position generator and coordinate generator components, which can be thought of as being part of smartbuffer\cite{smartbuffer} EDDO address-generation logic. 
+    \item However, microarchitectures which implement dataflow \textit{in a specific fashion to account for sparsity}, would count as SAF microarchitecture.
 \end{itemize}
 
 \subsection{Sequence generators and decoupled orchestration}
@@ -89,7 +92,7 @@ Support for coordinate calculations against sparse formats & Coordinate calculat
 Some observations about this reclassification:
 \begin{itemize}
     \item Most of the \textit{Efficient Processing} taxonomic primitives are reclassified as architecture or non-SAF microarchitecture, and thus will not be part of the taxonomy developed in this work.
-    \item Note that coordinate arithmetic units are classified as ``non-SAF microarchitecture'' because dense accelerators also perform coordinate arithmetic, so we assume here that existing tools are frameworks handle coordinate arithmetic well enough that we need not consider \textit{the coordinate arithmetic itself.}
+    \item Note that coordinate arithmetic units are classified as ``non-SAF microarchitecture'' because dense accelerators also perform coordinate arithmetic, so we assume here that existing tools and frameworks for modeling dense tensor accelerators are capable of modeling coordinate arithmetic. Thus, we need not consider coordinate arithmetic to be SAF microarchitecture.
     \item That said, to perform coordinate arithmetic on coordinates traversed by some rank $i$, requires that \textit{explicit}\cite{szebook} coordinate values be available as that rank is traversed - something which is not automatically true i.e. of implicit coordinate sparse representation formats, such as bitmask (B)\cite{szebook}. Table~\ref{tab:reclassify_saf_microarchitecture} classifies logic which supports coordinate arithmetic for implicit coordinate fibers as SAF microarchitecture.
 \end{itemize}
 
