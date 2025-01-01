@@ -106,16 +106,9 @@ TACO level format properties comprise
 
 Building on \cite{taco_format} (Section~\ref{sec:taco_format}) as well as \cite{extensor}, the authors of \textit{Efficient Processing} proposed a TACO-like hierarchical representation of sparse tensors, called the ``fibertree'' abstraction (Figure~\ref{fig:efficient_processing_fibertree}.) The TACO level format abstraction was motivated by avoiding the need to hard-code a new data structure and new sparse dataflow for each new representation format TACO supports\cite{taco_format}; the \textit{Efficient Processing} fibertree abstraction is motivated by a desire to decouple sparse representation format from sparse dataflow for hardware engineers in the early stages of design and planning\cite{szebook}. As with TACO\cite{taco_format}, \textit{Efficient Processing} defines a set of possible sparse representation formats, and then builds a framework for composing them into sparse tensor representation formats.
 
-\subsubsection{Taxonomy of sparse representation formats}
+\subsubsection{\textit{Efficient Processing} taxonomy of sparse representation formats}
 
-The three representation formats studied in \textit{Efficient Processing} are
-
-\begin{itemize}
-    \item \textbf{Uncompressed (U)} - a vector as it exists in memory without any compression, including zero-value elements.
-    \item \textbf{Uncompressed Offset Pairs (UOP)} - An uncompressed fiber format in which the payloads are ranges of offsets into another rank (this is discussed in Section~\ref{sec:fibertrees}.)
-    \item \textbf{Coordinate Payload (C)} - A compressed fiber format comprising an array of non-zero payloads, each with a corresponding explicit coordinate value.
-    \item \textbf{Bitmask (B)} - A compressed fiber format comprising an array of non-zero payloads, and a metadata array which is a bitmask of length equal to the size of the underlying uncompressed rank. The indices of non-zero entries (hot bits) in the metadata bitmask are the coordinates of corresponding non-zero payloads.
-\end{itemize}
+\textit{Efficient Processing}\cite{szebook} introduced a taxonomy of sparse representation formats. We will not discuss the \textit{Efficient Processing} taxonomy at length here, choosing for brevity to instead focus on the taxonomy of sparse representation formats introduced in the Sparseloop\cite{sparseloop} paper which will be introduced later. However, \textit{Efficient Processing} introduced the concepts of \textit{explicit and implicit representation formats} which are relevant in this work.
 
 \paragraph{Explicit and implicit representation formats.} \textit{Efficient Processing} categorizes sparse representation formats based on whether they have \textit{explicit coordinates} - i.e. the compressed payloads are associated with metadata that calls out specified coordinate values - or \textit{implicit coordinates} - i.e. the compressed payloads are associated with a metadata data structure which encodes coordinates but does not represent them explicitly.
 
@@ -232,7 +225,19 @@ Sparseloop\cite{sparseloop} extends Timeloop with support for Sparsity. Sparselo
 
 Nonetheless, a real design would require a microarchitectural change which implements the optimization, referred to here as the \textit{SAF microarchitecture.} Existing analytical modeling tools\cite{sparseloop} model only the benefits of exploiting SAFs (savings on memory capacity, fewer memory accesses, fewer compute cycles); these benefits are introduced in Section~\ref{background:safs}. These tools avoid modeling the costs of SAF microarchitectures by assuming (1) an ideal SAF microarchitecture which perfectly implements the SAF, and (2) a SAF microarchitecture with negligible energy and area overhead.
 
-Section~\ref{background:safs} introduces the Sparseloop unifed SAF taxonomy. Section~\ref{background:saf_uarch} demonstrates that SAF microarchitectures can \textit{sometimes} have significant implications for the design and modeling of sparse tensor accelerators. Thus, this work is motivated by the need to create novel SAF microarchitecture models.
+This section introduces the set of sparse representation formats considered in the Sparseloop paper, as well as the Sparseloop unifed SAF taxonomy. Subsequently, Section~\ref{background:saf_uarch} demonstrates that SAF microarchitectures can \textit{sometimes} have significant implications for the design and modeling of sparse tensor accelerators. Thus, this work is motivated by the need to create novel SAF microarchitecture models.
+
+\subsubsection{Sparse representation formats}
+\label{background:sparseloop_formats}
+
+The three sparse representation formats studied in Sparseloop\cite{sparseloop} are
+
+\begin{itemize}
+    \item \textbf{Uncompressed (U)} - a vector as it exists in memory without any compression, including zero-value elements.
+    \item \textbf{Uncompressed Offset Pairs (UOP)} - An uncompressed fiber format in which the payloads are ranges of offsets into another rank (this is discussed in Section~\ref{sec:fibertrees}.)
+    \item \textbf{Coordinate Payload (C)} - A compressed fiber format comprising an array of non-zero payloads, each with a corresponding explicit coordinate value.
+    \item \textbf{Bitmask (B)} - A compressed fiber format comprising an array of non-zero payloads, and a metadata array which is a bitmask of length equal to the size of the underlying uncompressed rank. The indices of non-zero entries (hot bits) in the metadata bitmask are the coordinates of corresponding non-zero payloads.
+\end{itemize}
 
 %
 % SAFs subsection
